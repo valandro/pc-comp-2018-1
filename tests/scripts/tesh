@@ -103,7 +103,7 @@ sub setenv_cmd {
   }
     
   print "[Tesh/INFO] setenv $var=$ctn\n";
-  $environ{$var} = $ctn;
+  $ENV{$var} = $ctn;
 }
 
 # Main option parsing sub
