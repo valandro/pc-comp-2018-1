@@ -51,3 +51,12 @@ $ ./main ./tests/e1/input/nivel0.tokens
 > 51 TK_IDENTIFICADOR [_int]
 > 51 TK_ESPECIAL []]
 
+! setenv INF47_TABLE=True
+$ "./main ./tests/e1/input/nivel0.tokens | sort"
+> 39 [2]
+> 40 [31794.45]
+> 41 [&]
+> 42 [oZ bool S9]
+> 43 [___bqmu7ftc1ICihA1pnIoWlvDHnaUnbS9LqgUPtmYLNKQ6O9fzKFyRj50N]
+> 51 [brasil]
+> 51 [_int]
