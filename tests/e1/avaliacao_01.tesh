@@ -585,3 +585,5 @@ $ ./main ./tests/e1/input/nivel1.tokens
 > 59 TK_ESPECIAL [;]
 > 59 TK_ESPECIAL [*]
 
+! setenv INF47_TABLE=True
+$ "./main ./tests/e1/input/nivel1.tokens | sort"

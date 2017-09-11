@@ -10,3 +10,6 @@ $ ./main ./tests/e1/input/nivel9.tokens
 > 5 TK_OC_AND [&&]
 > 6 TK_OC_OR [||]
 > 7 TOKEN_ERRO [.]
+
+! setenv INF47_TABLE=True
+$ "./main ./tests/e1/input/nivel9.tokens | sort"

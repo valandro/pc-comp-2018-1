@@ -38,4 +38,5 @@ $ ./main ./tests/e1/input/nivel15.tokens
 > 2 TK_ESPECIAL [}]
 > 2 TK_ESPECIAL [>]
 
-
+! setenv INF47_TABLE=True
+$ "./main ./tests/e1/input/nivel15.tokens | sort"

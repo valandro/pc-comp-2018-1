@@ -22,3 +22,6 @@ $ ./main ./tests/e1/input/nivel6.tokens
 > 1 TK_ESPECIAL [!]
 > 1 TK_ESPECIAL [&]
 > 1 TK_ESPECIAL [$]
+
+! setenv INF47_TABLE=True
+$ "./main ./tests/e1/input/nivel6.tokens | sort"
