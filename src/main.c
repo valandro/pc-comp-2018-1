@@ -91,12 +91,12 @@ int main_avaliacao_etapa_1 (int argc, char **argv)
 
 void cc_dict_etapa_1_print_entrada (char *token, int line)
 {
-  printf("[%s] %d\n", token, line);
+  printf("%d [%s]\n", line, token);
 }
 
 void cc_dict_etapa_2_print_entrada (char *token, int line, int tipo)
 {
-  printf("[%s] %d %d\n", token, line, tipo);
+  printf("%d [%s] %d\n", line, token, tipo);
 }
 
 void main_avaliacao_etapa_1_tabela (void)
