@@ -20,7 +20,7 @@ if [[ $# -lt 1 ]]; then
 fi
 output=$($VALGRIND $* 2>&1 1>/dev/null)
 invalidwrites=$(grep "Invalid write"<<< "$output" | wc -l)
-invalidreads=$(grep "Invalid write"<<< "$output" | wc -l)
+invalidreads=$(grep "Invalid read"<<< "$output" | wc -l)
 conditional=$(grep "Conditional"<<< "$output" | wc -l)
 lostbytes=$(grep "definitely lost:"<<< "$output" | awk '{ print $4 }' | sed "s/,//g")
 cat << EOF
