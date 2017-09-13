@@ -24,12 +24,12 @@ void yyerror(const char *s);
   Constantes a serem utilizadas para diferenciar os lexemas que estão
   registrados na tabela de símbolos.
 */
-#define SIMBOLO_LITERAL_INT    1
-#define SIMBOLO_LITERAL_FLOAT  2
-#define SIMBOLO_LITERAL_CHAR   3
-#define SIMBOLO_LITERAL_STRING 4
-#define SIMBOLO_LITERAL_BOOL   5
-#define SIMBOLO_IDENTIFICADOR  6
+#define POA_LIT_INT    1
+#define POA_LIT_FLOAT  2
+#define POA_LIT_CHAR   3
+#define POA_LIT_STRING 4
+#define POA_LIT_BOOL   5
+#define POA_IDENT      6
 
 void cc_dict_etapa_1_print_entrada (char *token, int line);
 int comp_get_line_number (void);
