@@ -21,14 +21,6 @@ int yylex();
 void yyerror(const char *s);
 
 /*
-  Constantes a serem utilizadas como valor de retorno no caso de
-  sucesso (SINTATICA_SUCESSO) e erro (SINTATICA_ERRO) do analisador
-  sintático.
-*/
-#define SINTATICA_SUCESSO 0
-#define SINTATICA_ERRO    1
-
-/*
   Constantes a serem utilizadas para diferenciar os lexemas que estão
   registrados na tabela de símbolos.
 */
