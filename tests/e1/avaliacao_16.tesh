@@ -9,4 +9,4 @@ $ ./main ./tests/e1/input/nivel16.tokens
 
 ! setenv INF47_TABLE=True
 $ "./main ./tests/e1/input/nivel16.tokens | sort"
-> 2 [2]
+> 2 [-2]

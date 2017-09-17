@@ -53,7 +53,7 @@ $ ./main ./tests/e1/input/nivel0.tokens
 
 ! setenv INF47_TABLE=True
 $ "./main ./tests/e1/input/nivel0.tokens | sort"
-> 39 [2]
+> 39 [-2]
 > 40 [31794.45]
 > 41 [&]
 > 42 [oZ bool S9]
