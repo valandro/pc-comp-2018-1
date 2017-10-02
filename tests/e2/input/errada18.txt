@@ -8,5 +8,5 @@ int f2 (int x)
 float my_function ()
   { 
   /* a=10; */
-  if (v[a+1] != 4+1) v[a/*+1*/] = f(2)+1 ;
+  if (v[a+1] != 4+1) { v[a/*+1*/] = f(2)+1 ;};
   }

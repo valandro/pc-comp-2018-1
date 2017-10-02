@@ -4,6 +4,6 @@ float f;
         a=5;
         p=a;
         if (a==0) then output x;
-        { output "nada"; }
+        { output "nada"; };
         output "fim";
 }

@@ -1,5 +1,5 @@
 int h[10];
 const funcao(int j)
 {
-	int abc <= 12;
+	int <= 12;
 }

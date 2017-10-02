@@ -1,5 +1,5 @@
 int static b;
 int a()
 {
-	float g;
+	float g
 }
