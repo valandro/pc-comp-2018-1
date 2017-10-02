@@ -4,7 +4,7 @@ int funcao()
 	float var <= 10;
 	{
 		int a;
-		int b
+		int b;
 	};
 
 	int c;
