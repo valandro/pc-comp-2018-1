@@ -7,9 +7,9 @@ float fun()
 	{
 		int p;
 		{
-			int k
+			int k;
 		};
 
-		int u
-	}
+		int u;
+	};
 }

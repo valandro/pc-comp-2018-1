@@ -3,7 +3,7 @@ static float funcao(int arg1, float arg2, char arg3)
 {
 	static const int v <= 10;
 	{
-		const int u <= 25
+		const int u <= 25;
 	};
 
 	float g;

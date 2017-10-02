@@ -7,7 +7,7 @@ int funcao()
 		int b
 	};
 
-	int c
+	int c;
 }
 
 float funcao2()

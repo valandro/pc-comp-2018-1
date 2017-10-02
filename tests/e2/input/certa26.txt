@@ -5,18 +5,19 @@ float fun()
     int c <= 30;
 
     {
-        ;
+        int a;
     };
 
     {
+    int a;
     };
 
     {
         {
-
+	int b;
         };  
         {
-            int b   
-        } 
-    }
+            int b   ;
+        };
+    };
 }
