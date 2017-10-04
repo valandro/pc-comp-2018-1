@@ -1,9 +1,9 @@
 /*
   Coloque aqui o identificador do grupo e dos seus membros
 */
-%{
+%code requires{
 #include "main.h"
-%}
+}
 
 /* Declaração dos tokens da linguagem */
 %token TK_PR_INT
