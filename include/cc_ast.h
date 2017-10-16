@@ -37,4 +37,10 @@
 #define AST_CHAMADA_DE_FUNCAO   27
 #define AST_SHIFT_RIGHT         28
 #define AST_SHIFT_LEFT          29
+#define AST_BREAK               30
+#define AST_CONTINUE            31
+#define AST_CASE                32
+#define AST_FOR                 33
+#define AST_FOREACH             34
+#define AST_SWITCH              35
 #endif
