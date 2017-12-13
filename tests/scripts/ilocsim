@@ -13,7 +13,7 @@ class Operation:
       for p in patterns:
          m = re.match(p, s)
          if m: break
-      self.op = [int(x) if re.match('^[0-9]+$',x) else x for x in m.groups()]
+      self.op = None if m is None else [int(x) if re.match('^(-?[0-9]+)$',x) else x for x in m.groups()]
 
    def pattern(self,ops,operandsLeft,operandsRight,arrow='=>'):
       if type(ops) in (list,set):
@@ -39,7 +39,7 @@ class Operation:
 
    def build_patterns(self, patterns):
       register = r'([Rr]\w+)'
-      const    = r'((?:[0-9]+)|(?:@\w+))'
+      const    = r'((?:-?[0-9]+)|(?:@\w+))'
       label    = r'([Ll]\w+)' # do labels really MUST start with L?
       l = []
       # op
@@ -102,7 +102,7 @@ class Storage:
 
 class Sim:
    def __init__(self, program, bss, fp, trace=False):
-      self.reg = Storage({'rbss':bss, 'rarp':fp})
+      self.reg = Storage({'rbss':bss, 'rarp':fp, 'rsp':fp, 'rpc':0})
       self.mem = Storage()
       self.labels = {}
       self.ip = 0
@@ -136,14 +136,14 @@ class Sim:
       l.sort(key=lambda x:-self.stats[x])
       for x in l:
          eprint('%d %s'%(self.stats[x],x))
-         
+
    def show_memory(self):
       l = [x for x in self.mem]
       l.sort()
       for x in l:
          eprint('%.8d %d'%(x,self.mem.get(x)))
 
-         
+
    def map_vars(self, code, varmap=None):
       if type(code) not in (list,set):
          code = [code]
@@ -163,7 +163,7 @@ class Sim:
          op = code[ip]
          if op[0] in ops:
             p = pos[op[0]]
-            if type(op[p]) != str or re.match('^[0-9]+$',op[p]): continue
+            if type(op[p]) != str or re.match('^([0-9]+)$',op[p]): continue
             if op[p] not in varmap:
                varmap[op[p]] = n
                n += 1
@@ -181,19 +181,26 @@ class Sim:
       varmap = {}
       labelmap = {}
       l = []
-      for s in program.split('\n'):
+      for linha, s in enumerate(program.split('\n')):
          if '//' in s:
             s = s[:s.find('//')]
          s = s.replace('\t',' ').replace('\r','').strip(' ')
 #         if s:
 #            eprint(len(l),s)
          while 1:
+            # Procura por labels
             m = re.match(r'^\s*(\w+)\s*:.*',s)
             if not m: break
             s = s[s.find(':')+1:].strip(' ')
             self.labels[m.group(1)] = len(l)
          if not s: continue
-         l.append( Operation(s).op )
+        #  print(s)
+         o = Operation(s).op
+         if o is None:
+             print("Syntax error\nLine", linha+1)
+             sys.exit(1)
+         else:
+             l.append( Operation(s).op )
       self.map_labels(l,self.labels)
       self.map_vars(l)
 #      eprint('---')
@@ -210,6 +217,7 @@ class Sim:
          eprint(self.reg['r0'],self.reg['r1'],self.reg['r2'],self.reg['r3'],self.reg['r4'])
       self.stats['instructions'] += 1
       op = self.code[self.ip]
+      self.reg['rpc'] = self.ip;
       self.ip += 1
 #      print(self.ip-1,op,self.reg.get('r1'),self.reg.get('r2'),self.reg.get('r3'),self.reg.get('r4'))
       if op[0] not in self.stats:
@@ -250,7 +258,7 @@ class Sim:
    def op_xorI   (self,op): self.reg[op[2]] = self.reg[op[0]]  ^ op[1]
 
    def op_load   (self,op): self.reg[op[1]] = self.mem[self.reg[op[0]]]
-   def op_loadI  (self,op): self.reg[op[1]] = op[0] if (op[1] != "rbss") else self.reg[op[1]]
+   def op_loadI  (self,op): self.reg[op[1]] = op[0] #if (op[1] != "rbss") else self.reg[op[1]]
    def op_loadAI (self,op): self.reg[op[2]] = self.mem[self.reg[op[0]]+op[1]]
    def op_loadAO (self,op): self.reg[op[2]] = self.mem[self.reg[op[0]]+self.reg[op[1]]]
 #   def op_cload
@@ -370,8 +378,8 @@ def main():
 
    if (args.instructions):
      sim.show_instructions_executed_counting()
-      
-   if (args.stats): 
+
+   if (args.stats):
      sim.show_stats()
 
    if (args.memory):
