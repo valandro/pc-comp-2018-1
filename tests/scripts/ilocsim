@@ -197,7 +197,7 @@ class Sim:
         #  print(s)
          o = Operation(s).op
          if o is None:
-             print("Syntax error\nLine", linha+1)
+             print("Erro sintático na linha", linha+1, "com a instrução (", s, ")")
              sys.exit(1)
          else:
              l.append( Operation(s).op )
