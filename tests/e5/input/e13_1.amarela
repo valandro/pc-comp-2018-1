@@ -7,12 +7,11 @@ int main()
   y = 298;
   if ((x > 300) && (y > 200)) then {
     x = 1234;
-  };else{
+  } else {
     x = 4566;
-  };;
+  };
 }
 
 //check is made through the number of cbr instructions executed
 //only one cbr has to be executed to pass this test
 //memory situation is also checked
-

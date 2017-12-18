@@ -5,15 +5,15 @@ int main()
   x = 0;
   if (x == 0) then {
     y = 456;
-  };else{
+  } else {
     y = 0;
-  };;
-  
+  };
+
   if (y > 0) then {
     x = 123;
-  };else{
+  } else {
     x = 456;
-  };;
+  };
 }
 
 // 00000004 456
