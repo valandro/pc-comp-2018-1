@@ -1,6 +1,6 @@
 /* global variable */
-int i0;
 int ints[52][43][31];
+int i0;
 float f1;
 bool bools[13][22][33][44];
 float vecf[35];
