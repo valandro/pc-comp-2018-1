@@ -113,11 +113,9 @@ class Storage:
             self.rspFirstUpdate = 1
 
       if (update):
-         eprint(x)
          self.stats['write'] += 1
          self.value[x] = y
       else:
-         eprint(x)
          eprint("Change of", x, "ignored (strict mode)");
 
 #
