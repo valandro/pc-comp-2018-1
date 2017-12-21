@@ -75,8 +75,9 @@ class Operation:
 
       [patterns.append(re.compile(self.pattern(*x))) for x in l]
 
-
-
+#
+# Classe que guarda os valores
+#
 class Storage:
    def __init__(self, values=None, default_f=lambda: 0xdeadbeef):
       self.stats = {'read':0,'write':0}
@@ -101,6 +102,9 @@ class Storage:
       self.stats['write'] += 1
       self.value[x] = y
 
+#
+# Classe do Simulador ILOC
+#
 class Sim:
    def __init__(self, program, bss, fp, trace=False):
       self.reg = Storage({'rbss':bss, 'rarp':fp, 'rsp':fp, 'rpc':0})
