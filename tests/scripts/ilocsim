@@ -376,15 +376,21 @@ def main():
 
    # Criar o simulador com o código do program (em program)
    sim = Sim(program, args.bss, args.stack, args.trace)
+
+   # Enquanto o tamanho do código do simulador for maior que o PC
    while len(sim.code) > sim.ip:
+      # Realiza um passo de simulação
       sim.step()
 
+   # Relata contagem de instruções executadas
    if (args.instructions):
      sim.show_instructions_executed_counting()
 
+   # Relata estatísticas
    if (args.stats):
      sim.show_stats()
 
+   # Relata o estado da memória
    if (args.memory):
      sim.show_memory()
 
