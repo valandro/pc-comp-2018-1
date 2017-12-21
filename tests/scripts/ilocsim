@@ -80,6 +80,8 @@ class Operation:
 #
 class Storage:
    def __init__(self, values=None, default_f=lambda: 0xdeadbeef):
+      self.rfpFirstUpdate = 0
+      self.rspFirstUpdate = 0
       self.stats = {'read':0,'write':0}
       self.value = {}
       if values:
@@ -99,8 +101,24 @@ class Storage:
       self.stats['read'] += 1
       return self.get(x)
    def __setitem__(self, x, y):
-      self.stats['write'] += 1
-      self.value[x] = y
+      update = 1
+      if (strict):
+         if (x == "rbss"):
+            update = 0
+         if (x == "rarp" and self.rfpFirstUpdate == 0):
+            update = 0
+            self.rfpFirstUpdate = 1
+         if (x == "rsp" and self.rspFirstUpdate == 0):
+            update = 0
+            self.rspFirstUpdate = 1
+
+      if (update):
+         eprint(x)
+         self.stats['write'] += 1
+         self.value[x] = y
+      else:
+         eprint(x)
+         eprint("Change of", x, "ignored (strict mode)");
 
 #
 # Classe do Simulador ILOC
@@ -368,8 +386,16 @@ def main():
    parser.add_argument('-t', '--trace', type=bool, default=0)
    parser.add_argument('--bss', type=int, default=0)
    parser.add_argument('--stack', type=int, default=1024)
+   # If active (default), strict makes impossible
+   # - any update of bss
+   # - the first definition of stack (rfp/rsp)
+   parser.add_argument('-x', '--strict', type=bool, default=1)
    parser.add_argument('ILOCFILE', nargs='?')
    args = parser.parse_args()
+
+   # Update the global strict
+   global strict
+   strict = args.strict
 
    # Ler do ILOCFILE, ou ler da entrada padrão (stdin)
    if args.ILOCFILE:
