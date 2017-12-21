@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import sys
 import re
 import argparse
@@ -354,9 +355,8 @@ class Sim:
       for x in tests:
          self.test(*x)
 
-
-
 def main():
+   # Os argumentos são os seguintes
    parser = argparse.ArgumentParser(description='ILOC Simulator')
    parser.add_argument('-i', '--instructions', type=bool, default=0)
    parser.add_argument('-m', '--memory', type=bool, default=0)
@@ -367,11 +367,14 @@ def main():
    parser.add_argument('ILOCFILE', nargs='?')
    args = parser.parse_args()
 
+   # Ler do ILOCFILE, ou ler da entrada padrão (stdin)
    if args.ILOCFILE:
       with open(args.ILOCFILE) as f:
          program = f.read()
    else:
       program = sys.stdin.read()
+
+   # Criar o simulador com o código do program (em program)
    sim = Sim(program, args.bss, args.stack, args.trace)
    while len(sim.code) > sim.ip:
       sim.step()
