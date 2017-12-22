@@ -1,4 +1,3 @@
-/* parameter passing: 49 in the bss address */
 int x;
 
 int f(int z, int w)
