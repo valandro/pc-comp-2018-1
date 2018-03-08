@@ -1,1 +1,13 @@
-Coloque aqui o identificador do grupo, listando o nome de cada membro.
+#+Title: PC
+
+* Grupo
+
+Coloque aqui o identificador do grupo, fornecido pelo professor.
+
+* Comentários
+
+Coloque aqui qualquer comentário que achares pertinente.
+
+* Documentação
+
+Forneça aqui uma documentação de uso do seu compilador.
