@@ -1,8 +1,4 @@
-#+Title: PC
-
-* Grupo
-
-Coloque aqui o identificador do grupo, fornecido pelo professor.
+#+Title: (Coloque aqui o identificador do grupo, fornecido pelo professor)
 
 * Comentários
 
