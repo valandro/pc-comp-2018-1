@@ -23,6 +23,14 @@ make
 ./main
 #+end_src
 
+* Testes
+
+No diretório que tem o binário =main=, execute
+
+#+begin_src shell :results output
+ctest -R e1
+#+end_src
+
 * Comentários
 
 Coloque aqui qualquer comentário que achares pertinente.
