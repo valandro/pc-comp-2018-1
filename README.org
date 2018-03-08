@@ -1,4 +1,23 @@
+#+STARTUP: overview indent
 #+Title: (Coloque aqui o identificador do grupo, fornecido pelo professor)
+
+* Prerequisitos
+
+Este programa depende das seguintes bibliotecas
+- cmake (criação de Makefiles /out-of-source/)
+- bison
+- flex
+- valgrind (para testes)
+
+* Compilação
+
+#+begin_src shell :results output
+git clone git@github.com:schnorr/pc.git
+mkdir -p pc/build
+cd pc/build
+# Ativar compilação para a Etapa 1
+cmake -DE1=ON ..
+#+end_src
 
 * Comentários
 
