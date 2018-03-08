@@ -9,7 +9,7 @@ Este programa depende das seguintes bibliotecas
 - flex
 - valgrind (para testes)
 
-* Compilação
+* Compilação e Execução
 
 #+begin_src shell :results output
 git clone git@github.com:schnorr/pc.git
@@ -17,6 +17,10 @@ mkdir -p pc/build
 cd pc/build
 # Ativar compilação para a Etapa 1
 cmake -DE1=ON ..
+# Compilar
+make
+# Executar
+./main
 #+end_src
 
 * Comentários
