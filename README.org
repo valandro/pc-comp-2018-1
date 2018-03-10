@@ -33,7 +33,8 @@ ctest -R e1
 
 * Comentários
 
-Coloque aqui qualquer comentário que achares pertinente.
+Repositório criado como mirror de [schnorr/pc](https://github.com/schnorr/pc).
+Criado utilizando https://stackoverflow.com/questions/10065526/github-how-to-make-a-fork-of-public-repository-private.
 
 * Documentação
 
