@@ -4,6 +4,7 @@
 %{
 #include "parser.h" //arquivo automaticamente gerado pelo bison
 %}
+SPACE [\ \t\r]
 %%
 int return TK_PR_INT;
 float return TK_PR_FLOAT;
