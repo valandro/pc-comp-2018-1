@@ -5,8 +5,10 @@
 #include "parser.h" //arquivo automaticamente gerado pelo bison
 %}
 
-SPACE [\ \t\r]
 %option yylineno
+
+SPACE [\ \t\r]
+SPECIAL_CHARACTER [,;:()\[\]\*{}+-/<>=!&%#^]
 
 %%
   /* Palavras Reservadas */
@@ -48,6 +50,9 @@ protected return TK_PR_PROTECTED;
 "%>%" return TK_OC_U1;
 "%|%" return TK_OC_U2;
 
+  /* Caracteres Especiais */
+{SPECIAL_CHARACTER}* return yytext[0];
+
   /* Whitespace */
 \n {};
 {SPACE}* {};
@@ -55,4 +60,5 @@ protected return TK_PR_PROTECTED;
   /* Comentários */
 "//".*  {};
 [/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] {};
+
 %%
