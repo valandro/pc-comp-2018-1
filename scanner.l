@@ -62,6 +62,8 @@ protected return TK_PR_PROTECTED;
 {INTEGER}(E|e){INTEGER} return TK_LIT_FLOAT;
 (true|TRUE) return TK_LIT_TRUE;
 (false|FALSE) return TK_LIT_FALSE;
+\'(.?)\' return TK_LIT_CHAR;
+\"(.*)\" return TK_LIT_STRING;
 
   /* Whitespace */
 \n {};
