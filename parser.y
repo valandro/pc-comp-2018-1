@@ -1,11 +1,12 @@
 /*
-  Coloque aqui o identificador do grupo e dos seus membros
+  GAMMA
 */
 %code requires{
 #include "main.h"
 }
 
 /* Declaração dos tokens da linguagem */
+/* Palavras Reservadas */
 %token TK_PR_INT
 %token TK_PR_FLOAT
 %token TK_PR_BOOL
@@ -31,6 +32,8 @@
 %token TK_PR_PRIVATE
 %token TK_PR_PUBLIC
 %token TK_PR_PROTECTED
+
+/* Operadores Compostos */
 %token TK_OC_LE
 %token TK_OC_GE
 %token TK_OC_EQ
@@ -39,6 +42,9 @@
 %token TK_OC_OR
 %token TK_OC_SL
 %token TK_OC_SR
+%token TK_OC_U1
+%token TK_OC_U2
+
 %token TK_LIT_INT
 %token TK_LIT_FLOAT
 %token TK_LIT_FALSE

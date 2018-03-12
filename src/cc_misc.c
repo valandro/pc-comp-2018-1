@@ -1,9 +1,9 @@
 #include "cc_misc.h"
 
+extern int yylineno;
 int comp_get_line_number (void)
 {
-  //implemente esta função
-  return -1;
+  return yylineno;
 }
 
 void yyerror (char const *mensagem)

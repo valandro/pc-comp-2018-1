@@ -1,11 +1,15 @@
 /*
-  Coloque aqui o identificador do grupo e dos seus membros
+  GAMMA
 */
 %{
 #include "parser.h" //arquivo automaticamente gerado pelo bison
 %}
+
 SPACE [\ \t\r]
+%option yylineno
+
 %%
+  /* Palavras Reservadas */
 int return TK_PR_INT;
 float return TK_PR_FLOAT;
 bool return TK_PR_BOOL;
@@ -31,6 +35,8 @@ class return TK_PR_CLASS;
 private return TK_PR_PRIVATE;
 public return TK_PR_PUBLIC;
 protected return TK_PR_PROTECTED;
+
+  /* Operadores Compostos */
 "<=" return TK_OC_LE;
 ">=" return TK_OC_GE;
 "==" return TK_OC_EQ;
@@ -39,8 +45,14 @@ protected return TK_PR_PROTECTED;
 "||" return TK_OC_OR;
 "<<" return TK_OC_SL;
 ">>" return TK_OC_SR;
+"%>%" return TK_OC_U1;
+"%|%" return TK_OC_U2;
+
+  /* Whitespace */
 \n {};
 {SPACE}* {};
+
+  /* Comentários */
 "//".*  {};
 [/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] {};
 %%

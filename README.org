@@ -1,5 +1,5 @@
 #+STARTUP: overview indent
-#+Title: (Coloque aqui o identificador do grupo, fornecido pelo professor)
+#+Title: GAMMA
 
 * Prerequisitos
 
@@ -33,8 +33,7 @@ ctest -R e1
 
 * Comentários
 
-Repositório criado como mirror de [schnorr/pc](https://github.com/schnorr/pc).
-Criado utilizando https://stackoverflow.com/questions/10065526/github-how-to-make-a-fork-of-public-repository-private.
+Repositório criado como mirror de https://github.com/schnorr/pc. Criado utilizando https://stackoverflow.com/questions/10065526/github-how-to-make-a-fork-of-public-repository-private.
 
 * Documentação
 
