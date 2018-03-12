@@ -45,6 +45,7 @@
 %token TK_OC_U1
 %token TK_OC_U2
 
+/* Literais */
 %token TK_LIT_INT
 %token TK_LIT_FLOAT
 %token TK_LIT_FALSE
@@ -52,6 +53,7 @@
 %token TK_LIT_CHAR
 %token TK_LIT_STRING
 %token TK_IDENTIFICADOR
+
 %token TOKEN_ERRO
 
 %%

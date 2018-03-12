@@ -9,6 +9,9 @@
 
 SPACE [\ \t\r]
 SPECIAL_CHARACTER [,;:()\[\]\*{}+-/<>=!&%#^]
+DIGIT [0-9]
+SIGNAL (\+|\-)*
+INTEGER {SIGNAL}{DIGIT}+
 
 %%
   /* Palavras Reservadas */
@@ -52,6 +55,13 @@ protected return TK_PR_PROTECTED;
 
   /* Caracteres Especiais */
 {SPECIAL_CHARACTER}* return yytext[0];
+
+  /* Literais */
+{INTEGER} return TK_LIT_INT;
+{INTEGER}.{DIGIT}+ return TK_LIT_FLOAT;
+{INTEGER}(E|e){INTEGER} return TK_LIT_FLOAT;
+(true|TRUE) return TK_LIT_TRUE;
+(false|FALSE) return TK_LIT_FALSE;
 
   /* Whitespace */
 \n {};
