@@ -8,6 +8,8 @@
 %option yylineno
 
 SPACE [\ \t\r]
+LETTERS [a-zA-Z]
+UNDERSCORE [\_]
 SPECIAL_CHARACTER [,;:()\[\]\*{}+-/<>=!&%#^]
 DIGIT [0-9]
 SIGNAL (\+|\-)*
@@ -73,4 +75,6 @@ protected return TK_PR_PROTECTED;
 "//".*  {};
 [/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] {};
 
+  /* Identificadores */
+({LETTERS}|{UNDERSCORE})+({LETTERS}|{UNDERSCORE}|{DIGIT})* return TK_IDENTIFICADOR;
 %%
