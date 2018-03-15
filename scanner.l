@@ -59,13 +59,13 @@ protected return TK_PR_PROTECTED;
 {SPECIAL_CHARACTER}* return yytext[0];
 
   /* Literais */
-{INTEGER} return TK_LIT_INT;
-{INTEGER}.{DIGIT}+ return TK_LIT_FLOAT;
-{INTEGER}(E|e){INTEGER} return TK_LIT_FLOAT;
+{INTEGER} {insert_stable(TK_LIT_INT); return TK_LIT_INT;}
+{INTEGER}.{DIGIT}+ {insert_stable(TK_LIT_FLOAT); return TK_LIT_FLOAT;}
+{INTEGER}(E|e){INTEGER} {insert_stable(TK_LIT_FLOAT); return TK_LIT_FLOAT;}
 (true|TRUE) return TK_LIT_TRUE;
 (false|FALSE) return TK_LIT_FALSE;
-\'(.?)\' return TK_LIT_CHAR;
-\"(.*)\" return TK_LIT_STRING;
+\'(.?)\' {insert_stable(TK_LIT_CHAR); return TK_LIT_CHAR;}
+\"(.*)\" {insert_stable(TK_LIT_STRING); return TK_LIT_STRING;}
 
   /* Whitespace */
 \n {};
@@ -76,5 +76,5 @@ protected return TK_PR_PROTECTED;
 [/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] {};
 
   /* Identificadores */
-({LETTERS}|{UNDERSCORE})+({LETTERS}|{UNDERSCORE}|{DIGIT})* return TK_IDENTIFICADOR;
+({LETTERS}|{UNDERSCORE})+({LETTERS}|{UNDERSCORE}|{DIGIT})* {insert_stable(TK_IDENTIFICADOR); return TK_IDENTIFICADOR;}
 %%
