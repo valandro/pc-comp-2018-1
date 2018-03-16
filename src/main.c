@@ -38,6 +38,7 @@ int main_avaliacao_etapa_1 (int argc, char **argv)
     case '%':
     case '#':
     case '^':
+    case '$':
     case '.': print_nome2 (token); break;
     case TK_PR_INT: print_nome(TK_PR_INT); break;
     case TK_PR_FLOAT: print_nome(TK_PR_FLOAT); break;

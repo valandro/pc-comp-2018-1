@@ -35,6 +35,9 @@ ctest -R e1
 
 Repositório criado como mirror de https://github.com/schnorr/pc. Criado utilizando https://stackoverflow.com/questions/10065526/github-how-to-make-a-fork-of-public-repository-private.
 
+Para executar os testes individualmente, utilize "ctest -R e1_avaliacao_00 -V".
+
+
 * Documentação
 
 Forneça aqui uma documentação de uso do seu compilador.

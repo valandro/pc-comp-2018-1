@@ -1,6 +1,6 @@
 #include "cc_misc.h"
 
-comp_dict_t *dict;
+comp_dict_t *symbol_table;
 extern int yylineno;
 extern char *yytext;
 
@@ -8,45 +8,49 @@ int comp_get_line_number (void)
 {
   return yylineno;
 }
-void insert_stable(int token){
-  int line_number = (intptr_t)yylineno;
+
+void insert_symbol_table(int token){
+  int line_number = (intptr_t) yylineno;
   char *lexeme = strdup(yytext);
 
-  if(token == TK_LIT_CHAR || token == TK_LIT_STRING){
-    memmove(lexeme, lexeme+1, strlen(lexeme)); //Remove o primeiro caracter ' ou "
+  // Caso char ou string, remover aspas da string.
+  if(token == TK_LIT_CHAR || token == TK_LIT_STRING) {
+    memmove(lexeme, lexeme + 1, strlen(lexeme)); //Remove o primeiro caracter ' ou "
     lexeme[strlen(lexeme) - 1] = '\0'; //Remove o último caracter ' ou "
   }
-  dict_remove(dict,lexeme);
-  dict_put(dict,lexeme,(void*)(intptr_t)line_number);
+
+  // Remoção e reinserção
+  // TODO: Está utilizando ponteiro para dados como valor. Utilizar uma estrutura separada para armazenar dados.
+  dict_remove(symbol_table, lexeme);
+  dict_put(symbol_table, lexeme, (void*)(intptr_t) line_number);
 
   free(lexeme);
 }
+
 void yyerror (char const *mensagem)
 {
-  fprintf (stderr, "%s\n", mensagem); //altere para que apareça a linha
+ fprintf (stderr, "%s. L: %d.\n", mensagem, comp_get_line_number());
 }
 
 void main_init (int argc, char **argv)
 {
-  //implemente esta função com rotinas de inicialização, se necessário
-  dict = dict_new();
+  // Rotinas de inicialização do programa
+  symbol_table = dict_new();
 }
 
 void main_finalize (void)
 {
-  //implemente esta função com rotinas de inicialização, se necessário
-  free(dict);
+  // Rotinas de encerramento do programa
+  free(symbol_table);
 }
 
 void comp_print_table (void)
 {
-  //para cada entrada na tabela de símbolos
-  //Etapa 1: chame a função cc_dict_etapa_1_print_entrada
-  //implemente esta função
   int i, l;
-  for (i = 0, l = dict->size; i < l; ++i) {
-    if (dict->data[i]) {
-      cc_dict_etapa_1_print_entrada (dict->data[i]->key, (int)(intptr_t)dict->data[i]->value);
+  for (i = 0, l = symbol_table->size; i < l; ++i) {
+    if (symbol_table->data[i]) {
+      // TODO: Está utilizando ponteiro para dados como valor. Utilizar uma estrutura separada para armazenar os dados.
+      cc_dict_etapa_1_print_entrada (symbol_table->data[i]->key, (int)(intptr_t) symbol_table->data[i]->value);
     }
   }
 }

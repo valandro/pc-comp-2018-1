@@ -8,14 +8,34 @@
 %option yylineno
 
 SPACE [\ \t\r]
-LETTERS [a-zA-Z]
+LETTER [a-zA-Z]
 UNDERSCORE [\_]
-SPECIAL_CHARACTER [,;:()\[\]\*{}+-/<>=!&%#^]
+SPECIAL_CHARACTER [.,;:()\[\]\*{}+-/<>$=!&%#^]
 DIGIT [0-9]
-SIGNAL (\+|\-)*
+SIGNAL (\+|\-)?
 INTEGER {SIGNAL}{DIGIT}+
 
+LIT_FALSE (false)
+LIT_TRUE (true)
+LIT_CHAR 	\'(.?)\'
+LIT_STRING 	\"(\\.|[^\\"])*\"
+
+%x comentarioMultiline
+
 %%
+  /* Comentários */
+"/*"  BEGIN(comentarioMultiline);   /* Alteração de estado para tratar comentário multiline. */
+<comentarioMultiline>[^*\n]*        /* remove qualquer coisa que não seja '*' */
+<comentarioMultiline>"*"+[^*/\n]*   /* remove todos '*' não seguidos de '/' */
+<comentarioMultiline>\n             /* remove line-ending */
+<comentarioMultiline>"*"+"/"        BEGIN(INITIAL); /* Encerramento de comentário. Retorna ao estado normal. */
+
+"//".*  {};
+
+  /* Whitespace */
+\n {};
+{SPACE}* {};
+
   /* Palavras Reservadas */
 int return TK_PR_INT;
 float return TK_PR_FLOAT;
@@ -56,25 +76,23 @@ protected return TK_PR_PROTECTED;
 "%|%" return TK_OC_U2;
 
   /* Caracteres Especiais */
-{SPECIAL_CHARACTER}* return yytext[0];
+{SPECIAL_CHARACTER} return yytext[0];
 
   /* Literais */
-{INTEGER} {insert_stable(TK_LIT_INT); return TK_LIT_INT;}
-{INTEGER}.{DIGIT}+ {insert_stable(TK_LIT_FLOAT); return TK_LIT_FLOAT;}
-{INTEGER}(E|e){INTEGER} {insert_stable(TK_LIT_FLOAT); return TK_LIT_FLOAT;}
-(true|TRUE) return TK_LIT_TRUE;
-(false|FALSE) return TK_LIT_FALSE;
-\'(.?)\' {insert_stable(TK_LIT_CHAR); return TK_LIT_CHAR;}
-\"(.*)\" {insert_stable(TK_LIT_STRING); return TK_LIT_STRING;}
-
-  /* Whitespace */
-\n {};
-{SPACE}* {};
-
-  /* Comentários */
-"//".*  {};
-[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] {};
+{LIT_TRUE} return TK_LIT_TRUE;
+{LIT_FALSE} return TK_LIT_FALSE;
+{INTEGER} { insert_symbol_table(TK_LIT_INT); return TK_LIT_INT;}
+{INTEGER}.{DIGIT}+ { insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
+{INTEGER}(E|e){INTEGER} { insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
+{LIT_CHAR} { insert_symbol_table(TK_LIT_CHAR); return TK_LIT_CHAR; }
+{LIT_STRING} { insert_symbol_table(TK_LIT_STRING); return TK_LIT_STRING; }
 
   /* Identificadores */
-({LETTERS}|{UNDERSCORE})+({LETTERS}|{UNDERSCORE}|{DIGIT})* {insert_stable(TK_IDENTIFICADOR); return TK_IDENTIFICADOR;}
+({LETTER}|{UNDERSCORE})+({LETTER}|{UNDERSCORE}|{DIGIT})* { insert_symbol_table(TK_IDENTIFICADOR); return TK_IDENTIFICADOR; }
+
+  /* Catch-all para inválidos */
+. {
+  yyerror("Token invalido");
+  return TOKEN_ERRO;
+}
 %%
