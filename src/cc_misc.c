@@ -13,12 +13,6 @@ void insert_symbol_table(int token){
   int line_number = (intptr_t) yylineno;
   char *lexeme = strdup(yytext);
 
-  // Caso char ou string, remover aspas da string.
-  if(token == TK_LIT_CHAR || token == TK_LIT_STRING) {
-    memmove(lexeme, lexeme + 1, strlen(lexeme)); //Remove o primeiro caracter ' ou "
-    lexeme[strlen(lexeme) - 1] = '\0'; //Remove o último caracter ' ou "
-  }
-
   // Remoção e reinserção
   // TODO: Está utilizando ponteiro para dados como valor. Utilizar uma estrutura separada para armazenar dados.
   dict_remove(symbol_table, lexeme);
@@ -44,13 +38,29 @@ void main_finalize (void)
   free(symbol_table);
 }
 
+int keyIsChar(char* key) {
+  return key[0] == '\'' && key[strlen(key) - 1] == '\'';
+}
+
+int keyIsString(char* key) {
+  return key[0] == '\"' && key[strlen(key) - 1] == '\"';
+}
+
 void comp_print_table (void)
 {
-  int i, l;
-  for (i = 0, l = symbol_table->size; i < l; ++i) {
+  int i, table_size;
+  for (i = 0, table_size = symbol_table->size; i < table_size; ++i) {
     if (symbol_table->data[i]) {
+      char* temp = strdup(symbol_table->data[i]->key);
+
+      // Caso for um literal de tipo char ou string (iniciado e terminado com aspas), remover aspas.
+      if(keyIsChar(temp) || keyIsString(temp)) {
+        memmove(temp, temp + 1, strlen(temp)); //Remove o primeiro caracter ' ou "
+        temp[strlen(temp) - 1] = '\0'; //Remove o último caracter ' ou "
+      }
+
       // TODO: Está utilizando ponteiro para dados como valor. Utilizar uma estrutura separada para armazenar os dados.
-      cc_dict_etapa_1_print_entrada (symbol_table->data[i]->key, (int)(intptr_t) symbol_table->data[i]->value);
+      cc_dict_etapa_1_print_entrada (temp, (int)(intptr_t) symbol_table->data[i]->value);
     }
   }
 }

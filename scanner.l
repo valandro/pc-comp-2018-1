@@ -82,7 +82,7 @@ protected return TK_PR_PROTECTED;
 {LIT_TRUE} return TK_LIT_TRUE;
 {LIT_FALSE} return TK_LIT_FALSE;
 {INTEGER} { insert_symbol_table(TK_LIT_INT); return TK_LIT_INT;}
-{INTEGER}.{DIGIT}+ { insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
+{INTEGER}[\.]{DIGIT}+ { insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
 {INTEGER}(E|e){INTEGER} { insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
 {LIT_CHAR} { insert_symbol_table(TK_LIT_CHAR); return TK_LIT_CHAR; }
 {LIT_STRING} { insert_symbol_table(TK_LIT_STRING); return TK_LIT_STRING; }
@@ -92,7 +92,7 @@ protected return TK_PR_PROTECTED;
 
   /* Catch-all para inválidos */
 . {
-  yyerror("Token invalido");
+  /* yyerror("Token invalido"); */
   return TOKEN_ERRO;
 }
 %%
