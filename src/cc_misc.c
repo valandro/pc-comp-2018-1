@@ -7,9 +7,9 @@ comp_dict_t *symbol_table;
 intArray symbol_data;
 
 void initArray(intArray *a) {
-  a->array = (int*) malloc(INIT_ARRAYSIZE * sizeof(int));
+  a->array = (int*) malloc(DICT_SIZE * sizeof(int));
   a->used = 0;
-  a->size = INIT_ARRAYSIZE;
+  a->size = DICT_SIZE;
 }
 
 int insertArray(intArray *a, int element) {
@@ -69,10 +69,33 @@ void main_init (int argc, char **argv)
   initArray(&symbol_data);
 }
 
+int clearDictEntries(comp_dict_t* dict) {
+  int i, finished = 1;
+  for (i = 0; i < dict->size && finished; i++) {
+    if (dict->data[i]) {
+      dict_remove(dict, dict->data[i]->key);
+    }
+  }
+  return dict->occupation;
+}
+
 void main_finalize (void)
 {
   // Rotinas de encerramento do programa
+
+  // Liberar array de dados da tabela de símbolos
   freeArray(&symbol_data);
+
+  // Liberar entradas da tabela de símbolos
+  int occupation;
+  do {
+    // Existiam entradas na tabela com múltiplas entradas,
+    // logo é necessário reiniciar o processo para eliminar as entradas restantes.
+    occupation = clearDictEntries(symbol_table);
+  } while (occupation > 0);
+
+  // Liberar dicionário da tabela de símbolos
+  dict_free(symbol_table);
 }
 
 void comp_print_table (void)
