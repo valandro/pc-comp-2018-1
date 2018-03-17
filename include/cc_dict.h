@@ -1,22 +1,22 @@
-// Copyright (c) 2016 Lucas Nodari 
+// Copyright (c) 2016 Lucas Nodari
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef CC_DICT_H_
 #define CC_DICT_H_
 
-/* 
+/*
  * Constante: DICT_SIZE, representa o tamanho de uma tabela de símbolos
  */
 #define DICT_SIZE 10240
@@ -35,7 +35,7 @@ typedef struct comp_dict_item {
   struct comp_dict_item *next;  // ponteiro de overflow
 } comp_dict_item_t;
 
-/* 
+/*
  * Tipo: comp_dict_t, é o tipo da tabela de símbolos. O campo _size_
  * indica o tamanho total, inicializado para DICT_SIZE e depois não é
  * mais mudado. O campo _occupation_ indica a ocupação atual da
@@ -80,7 +80,7 @@ void dict_free(comp_dict_t * dict);
  */
 void *dict_put(comp_dict_t * dict, char *key, void *value);
 
-/* 
+/*
  * Função: dict_get, obtém o valor de uma entrada na tabela de
  * símbolos. Recebe dois parâmetros: o parâmetro _dict_ é um ponteiro
  * para a tabela de símbolos da qual será obtida a entrada (este
@@ -93,7 +93,7 @@ void *dict_put(comp_dict_t * dict, char *key, void *value);
  */
 void *dict_get(comp_dict_t * dict, char *key);
 
-/* 
+/*
  * Função: dict_remove, remove o valor de uma entrada na tabela de
  * símbolos. Recebe dois parâmetros: o parâmetro _dict_ é um ponteiro
  * para a tabela de símbolos da qual será obtida a entrada (este

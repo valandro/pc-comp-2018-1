@@ -206,14 +206,16 @@ void *dict_get(comp_dict_t * dict, char *key)
     ERRO("At least one parameter is NULL");
   }
 
-
   int hash = generate_hash(key, dict->size);
   comp_dict_item_t *item = NULL;
 
-  if (dict->data[hash])
+  if (dict->data[hash]) {
     item = dict_item_get(dict->data[hash], key);
-  
-  return item->value;
+    if(item) {
+      return item->value;
+    }
+  }
+  return NULL;
 }
 
 void *dict_remove(comp_dict_t * dict, char *key)
