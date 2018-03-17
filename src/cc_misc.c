@@ -100,13 +100,20 @@ void main_finalize (void)
 
 void comp_print_table (void)
 {
-  int i, table_size;
-  for (i = 0, table_size = symbol_table->size; i < table_size; ++i) {
+  int i, table_size = symbol_table->size;
+  for (i = 0; i < table_size; ++i) {
     if (symbol_table->data[i]) {
-      char* key = symbol_table->data[i]->key;
-      int* value = symbol_table->data[i]->value;
+      char* key;
+      int* value;
 
-      cc_dict_etapa_1_print_entrada (key, *value);
+      comp_dict_item_t* item = symbol_table->data[i];
+      while(item) {
+        key = item->key;
+        value = item->value;
+
+        cc_dict_etapa_1_print_entrada(key, *value);
+        item = item->next;
+      }
     }
   }
 }
