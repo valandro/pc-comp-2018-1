@@ -10,7 +10,7 @@
 SPACE [\ \t\r]
 LETTER [a-zA-Z]
 UNDERSCORE [\_]
-SPECIAL_CHARACTER [.,;:()\[\]\*{}+-/<>$=!&%#^]
+SPECIAL_CHARACTER [.,;:()\[\]\*{}+-/<>=!&%#^]
 DIGIT [0-9]
 SIGNAL (\+|\-)?
 INTEGER {SIGNAL}{DIGIT}+
@@ -78,7 +78,7 @@ protected return TK_PR_PROTECTED;
 
   /* Caracteres Especiais */
 {SPECIAL_CHARACTER} return yytext[0];
- 
+
   /* Literais */
 {LIT_TRUE} return TK_LIT_TRUE;
 {LIT_FALSE} return TK_LIT_FALSE;
