@@ -6,10 +6,16 @@
 #include "cc_dict.h"
 
 typedef struct {
-  int *array;
+  int line;
+  int tokenType;
+  int tokenValue;
+} symbol;
+
+typedef struct {
+  struct symbol *array;
   size_t used;
   size_t size;
-} intArray;
+} symbolArray;
 
 int getLineNumber (void);
 void yyerror (char const *mensagem);

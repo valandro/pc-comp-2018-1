@@ -4,18 +4,18 @@ extern int yylineno;
 extern char *yytext;
 
 comp_dict_t *symbol_table;
-intArray symbol_data;
+symbolArray symbol_data;
 
-void initArray(intArray *a) {
-  a->array = (int*) malloc(DICT_SIZE * sizeof(int));
+void initArray(symbolArray *a) {
+  a->array = (struct symbol*) malloc(DICT_SIZE * sizeof(struct symbol));
   a->used = 0;
   a->size = DICT_SIZE;
 }
 
-int insertArray(intArray *a, int element) {
+int insertArray(symbolArray *a, struct symbol element) {
   if (a->used == a->size) {
     a->size *= 2;
-    a->array = (int *) realloc(a->array, a->size * sizeof(int));
+    a->array = (struct symbol *) realloc(a->array, a->size * sizeof(struct symbol));
   }
   a->array[a->used++] = element;
 
@@ -23,7 +23,7 @@ int insertArray(intArray *a, int element) {
   return a->used - 1;
 }
 
-void freeArray(intArray *a) {
+void freeArray(symbolArray *a) {
   free(a->array);
   a->array = NULL;
   a->used = a->size = 0;
@@ -44,14 +44,23 @@ void insert_symbol_table(int token) {
     lexeme[strlen(lexeme) - 1] = '\0'; //Remove o último caracter ' ou "
   }
 
-  // Remoção e reinserção
-  int* found = dict_get(symbol_table, lexeme);
+  // Procurar o token na tabela de símbolos.
+  // Se encontrado, atualiza o valor da última linha encontra.
+  // Se não, insere na tabela.
+  struct symbol* found = dict_get(symbol_table, lexeme);
   if(found) {
     // Atualizar valor para valor da última linha onde lexema é encontrado
-    *found = yylineno;
+    (*found).line = yylineno;
   } else {
-    // Lexema não encontrado, inserindo no array de dados
-    dataIndex = insertArray(&symbol_data, yylineno);
+    // Lexema não encontrado, inserindo elemento no array de dados
+
+    // TODO: inserir valores dos tokens
+    struct symbol element;
+    element.line = yylineno;
+    element.tokenType = 0;
+    element.tokenValue = 0;
+
+    dataIndex = insertArray(&symbol_data, element);
     dict_put(symbol_table, lexeme, &symbol_data.array[dataIndex]);
   }
   free(lexeme);
@@ -79,6 +88,19 @@ int clearDictEntries(comp_dict_t* dict) {
   return dict->occupation;
 }
 
+void clearDict(comp_dict_t* dict) {
+  // Liberar entradas da tabela de símbolos
+  int occupation;
+  do {
+    // Existiam linhas na tabela com múltiplas entradas,
+    // logo é necessário reiniciar o processo para eliminar as entradas restantes.
+    occupation = clearDictEntries(dict);
+  } while (occupation > 0);
+
+  // Liberar dicionário da tabela de símbolos
+  dict_free(symbol_table);
+}
+
 void main_finalize (void)
 {
   // Rotinas de encerramento do programa
@@ -86,16 +108,8 @@ void main_finalize (void)
   // Liberar array de dados da tabela de símbolos
   freeArray(&symbol_data);
 
-  // Liberar entradas da tabela de símbolos
-  int occupation;
-  do {
-    // Existiam entradas na tabela com múltiplas entradas,
-    // logo é necessário reiniciar o processo para eliminar as entradas restantes.
-    occupation = clearDictEntries(symbol_table);
-  } while (occupation > 0);
-
-  // Liberar dicionário da tabela de símbolos
-  dict_free(symbol_table);
+  // Liberar a tabela de símbolos
+  clearDict(symbol_table);
 }
 
 void comp_print_table (void)
