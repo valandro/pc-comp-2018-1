@@ -72,12 +72,14 @@ TK_PR_PROTECTED |
 TK_PR_PRIVATE |
 TK_PR_PUBLIC
 ;
+
 /* Regras de apoio - Fim */
 
 program: body ;
 
 body:
 body dec_var_new_type ';' |
+body dec_var_global ';' |
 ;
 
 dec_var_new_type:
@@ -92,4 +94,17 @@ field
 field:
 encap type TK_IDENTIFICADOR ;
 
+dec_var_global:
+declare vector |
+TK_PR_CLASS declare vector
+;
+
+declare:
+type TK_IDENTIFICADOR |
+TK_IDENTIFICADOR TK_IDENTIFICADOR
+;
+
+vector:
+'[' TK_LIT_INT ']' |
+;
 %%
