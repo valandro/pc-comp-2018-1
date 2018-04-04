@@ -55,10 +55,41 @@
 %token TK_IDENTIFICADOR
 
 %token TOKEN_ERRO
-
+%start program
 %%
 /* Regras (e ações) da gramática */
+/* Regras de apoio - Começo */
+type:
+TK_PR_INT |
+TK_PR_FLOAT |
+TK_PR_CHAR |
+TK_PR_BOOL |
+TK_PR_STRING
+;
 
-programa:
+encap:
+TK_PR_PROTECTED |
+TK_PR_PRIVATE |
+TK_PR_PUBLIC
+;
+/* Regras de apoio - Fim */
+
+program: body ;
+
+body:
+body dec_var_new_type ';' |
+;
+
+dec_var_new_type:
+TK_PR_CLASS TK_IDENTIFICADOR '[' list_fields ']'
+;
+
+list_fields:
+list_fields ':' field |
+field
+;
+
+field:
+encap type TK_IDENTIFICADOR ;
 
 %%
