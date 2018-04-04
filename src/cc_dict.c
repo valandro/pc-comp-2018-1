@@ -211,11 +211,11 @@ void *dict_get(comp_dict_t * dict, char *key)
 
   if (dict->data[hash]) {
     item = dict_item_get(dict->data[hash], key);
-    if(item) {
-      return item->value;
-    }
-  }
-  return NULL;
+  
+  if(item == NULL)
+    return NULL;
+  else
+    return item->value;
 }
 
 void *dict_remove(comp_dict_t * dict, char *key)
