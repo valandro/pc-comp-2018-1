@@ -7,15 +7,15 @@ comp_dict_t *symbol_table;
 symbolArray symbol_data;
 
 void initArray(symbolArray *a) {
-  a->array = (struct symbol*) malloc(DICT_SIZE * sizeof(struct symbol));
+  a->array = (symbol*) malloc(DICT_SIZE * sizeof(symbol));
   a->used = 0;
   a->size = DICT_SIZE;
 }
 
-int insertArray(symbolArray *a, struct symbol element) {
+int insertArray(symbolArray *a, symbol element) {
   if (a->used == a->size) {
     a->size *= 2;
-    a->array = (struct symbol *) realloc(a->array, a->size * sizeof(struct symbol));
+    a->array = (symbol *) realloc(a->array, a->size * sizeof(symbol));
   }
   a->array[a->used++] = element;
 
@@ -47,7 +47,7 @@ void insert_symbol_table(int token) {
   // Procurar o token na tabela de símbolos.
   // Se encontrado, atualiza o valor da última linha encontra.
   // Se não, insere na tabela.
-  struct symbol* found = dict_get(symbol_table, lexeme);
+  symbol* found = dict_get(symbol_table, lexeme);
   if(found) {
     // Atualizar valor para valor da última linha onde lexema é encontrado
     (*found).line = yylineno;
@@ -55,7 +55,7 @@ void insert_symbol_table(int token) {
     // Lexema não encontrado, inserindo elemento no array de dados
 
     // TODO: inserir valores dos tokens
-    struct symbol element;
+    symbol element;
     element.line = yylineno;
     element.tokenType = 0;
     element.tokenValue = 0;

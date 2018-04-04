@@ -12,7 +12,7 @@ Este programa depende das seguintes bibliotecas
 * Compilação e Execução
 
 #+begin_src shell :results output
-git clone git@github.com:schnorr/pc.git
+git clone git@github.com:FranciscoKnebel/pc-comp.git
 mkdir -p pc/build
 cd pc/build
 # Ativar compilação para a Etapa 1
@@ -35,9 +35,11 @@ ctest -R e1
 
 Repositório criado como mirror de https://github.com/schnorr/pc. Criado utilizando https://stackoverflow.com/questions/10065526/github-how-to-make-a-fork-of-public-repository-private.
 
+Para executar todos os testes da etapa, utilize "ctest -R e1".
+
 Para executar os testes individualmente, utilize "ctest -R e1_avaliacao_00 -V".
 
 
 * Documentação
 
-Forneça aqui uma documentação de uso do seu compilador.
+TODO

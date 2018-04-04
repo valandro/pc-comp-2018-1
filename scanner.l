@@ -15,11 +15,14 @@ DIGIT [0-9]
 SIGNAL (\+|\-)?
 INTEGER {SIGNAL}{DIGIT}+
 FLOAT {INTEGER}[\.]{DIGIT}+
+EXP_FLOAT ({FLOAT}|{INTEGER})(E|e){INTEGER}
 
 LIT_FALSE (false)
 LIT_TRUE (true)
 LIT_CHAR 	\'(.?)\'
 LIT_STRING 	\"(\\.|[^\\"])*\"
+
+IDENTIFIER ({LETTER}|{UNDERSCORE})+({LETTER}|{UNDERSCORE}|{DIGIT})*
 
 %x comentarioMultiline
 
@@ -84,12 +87,15 @@ protected return TK_PR_PROTECTED;
 {LIT_FALSE} return TK_LIT_FALSE;
 {INTEGER} { insert_symbol_table(TK_LIT_INT); return TK_LIT_INT;}
 {FLOAT} { insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
-({FLOAT}|{INTEGER})(E|e){INTEGER} { insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
+{EXP_FLOAT} { insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
 {LIT_CHAR} { insert_symbol_table(TK_LIT_CHAR); return TK_LIT_CHAR; }
 {LIT_STRING} { insert_symbol_table(TK_LIT_STRING); return TK_LIT_STRING; }
 
   /* Identificadores */
-({LETTER}|{UNDERSCORE})+({LETTER}|{UNDERSCORE}|{DIGIT})* { insert_symbol_table(TK_IDENTIFICADOR); return TK_IDENTIFICADOR; }
+{IDENTIFIER} { insert_symbol_table(TK_IDENTIFICADOR); return TK_IDENTIFICADOR; }
+
+  /* Catch erro de númericos seguidos por identificadores */
+({INTEGER}|{FLOAT}|{EXP_FLOAT}){IDENTIFIER}+ return TOKEN_ERRO;
 
   /* Catch-all para inválidos */
 . {

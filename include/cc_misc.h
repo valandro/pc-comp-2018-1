@@ -12,7 +12,7 @@ typedef struct {
 } symbol;
 
 typedef struct {
-  struct symbol *array;
+  symbol *array;
   size_t used;
   size_t size;
 } symbolArray;
