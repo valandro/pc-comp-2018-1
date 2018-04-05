@@ -55,6 +55,13 @@
 %token TK_IDENTIFICADOR
 
 %token TOKEN_ERRO
+
+%union
+{
+  symbol* valor_lexico;
+}
+
+
 %start program
 %%
 /* Regras (e ações) da gramática */

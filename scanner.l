@@ -85,14 +85,14 @@ protected return TK_PR_PROTECTED;
   /* Literais */
 {LIT_TRUE} return TK_LIT_TRUE;
 {LIT_FALSE} return TK_LIT_FALSE;
-{INTEGER} { insert_symbol_table(TK_LIT_INT); return TK_LIT_INT;}
-{FLOAT} { insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
-{EXP_FLOAT} { insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
-{LIT_CHAR} { insert_symbol_table(TK_LIT_CHAR); return TK_LIT_CHAR; }
-{LIT_STRING} { insert_symbol_table(TK_LIT_STRING); return TK_LIT_STRING; }
+{INTEGER} { yylval.valor_lexico = insert_symbol_table(TK_LIT_INT); return TK_LIT_INT;}
+{FLOAT} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
+{EXP_FLOAT} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
+{LIT_CHAR} { yylval.valor_lexico = insert_symbol_table(TK_LIT_CHAR); return TK_LIT_CHAR; }
+{LIT_STRING} { yylval.valor_lexico = insert_symbol_table(TK_LIT_STRING); return TK_LIT_STRING; }
 
   /* Identificadores */
-{IDENTIFIER} { insert_symbol_table(TK_IDENTIFICADOR); return TK_IDENTIFICADOR; }
+{IDENTIFIER} { yylval.valor_lexico = insert_symbol_table(TK_IDENTIFICADOR); return TK_IDENTIFICADOR; }
 
   /* Catch erro de númericos seguidos por identificadores */
 ({INTEGER}|{FLOAT}|{EXP_FLOAT}){IDENTIFIER}+ return TOKEN_ERRO;

@@ -34,8 +34,9 @@ int comp_get_line_number (void)
   return yylineno;
 }
 
-void insert_symbol_table(int token) {
+symbol* insert_symbol_table(int token) {
   char *lexeme = strdup(yytext);
+  size_t i;
 
   // Caso char ou string, remover aspas da string.
   if(token == TK_LIT_CHAR || token == TK_LIT_STRING) {
@@ -46,14 +47,12 @@ void insert_symbol_table(int token) {
   // Procurar o token na tabela de símbolos.
   // Se encontrado, atualiza o valor da última linha encontra.
   // Se não, insere na tabela.
-  symbol* found = dict_get(symbol_table, lexeme);
-  if(found) {
+  symbol* foundEntry = dict_get(symbol_table, lexeme);
+  if(foundEntry) {
     // Atualizar valor para valor da última linha onde lexema é encontrado
-    (*found).line = yylineno;
+    (*foundEntry).line = yylineno;
   } else {
     // Lexema não encontrado, inserindo elemento no array de dados
-
-    // TODO: inserir valores dos tokens
     symbol element;
     element.line = yylineno;
 
@@ -83,10 +82,14 @@ void insert_symbol_table(int token) {
         break;
     }
 
-    size_t i = insertArray(&symbol_data, element);
-    dict_put(symbol_table, lexeme, &symbol_data.array[i]);
+    i = insertArray(&symbol_data, element);
+    foundEntry = &symbol_data.array[i];
+    dict_put(symbol_table, lexeme, foundEntry);
   }
   free(lexeme);
+
+  // Retorna ponteiro na tabela de símbolos para a entrada.
+  return foundEntry;
 }
 
 void yyerror (char const *mensagem)
