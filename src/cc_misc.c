@@ -36,7 +36,6 @@ int comp_get_line_number (void)
 
 void insert_symbol_table(int token) {
   char *lexeme = strdup(yytext);
-  size_t dataIndex;
 
   // Caso char ou string, remover aspas da string.
   if(token == TK_LIT_CHAR || token == TK_LIT_STRING) {
@@ -57,11 +56,35 @@ void insert_symbol_table(int token) {
     // TODO: inserir valores dos tokens
     symbol element;
     element.line = yylineno;
-    element.tokenType = 0;
-    element.tokenValue = 0;
 
-    dataIndex = insertArray(&symbol_data, element);
-    dict_put(symbol_table, lexeme, &symbol_data.array[dataIndex]);
+    switch (token) {
+      case TK_LIT_INT:
+        element.type = POA_LIT_INT;
+        element.value.i = atoi(lexeme);
+        break;
+      case TK_LIT_FLOAT:
+        element.type = POA_LIT_FLOAT;
+        element.value.f = atof(lexeme);
+        break;
+      case TK_LIT_CHAR:
+        element.type = POA_LIT_CHAR;
+        element.value.c = (char) lexeme[0];
+        break;
+      case TK_LIT_STRING:
+        element.type = POA_LIT_STRING;
+        element.value.s = strdup(lexeme);
+        break;
+      case TK_IDENTIFICADOR:
+        element.type = POA_IDENT;
+        element.value.s = strdup(lexeme);
+        break;
+      default:
+        // No default behavior defined.
+        break;
+    }
+
+    size_t i = insertArray(&symbol_data, element);
+    dict_put(symbol_table, lexeme, &symbol_data.array[i]);
   }
   free(lexeme);
 }

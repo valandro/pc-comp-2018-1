@@ -5,10 +5,17 @@
 #include "parser.h"
 #include "cc_dict.h"
 
+union tValue {
+  int i;
+  float f;
+  char c;
+  char* s;
+};
+
 typedef struct {
-  int line;
-  int tokenType;
-  int tokenValue;
+  size_t line;
+  size_t type;
+  union tValue value;
 } symbol;
 
 typedef struct {
