@@ -144,14 +144,14 @@ void comp_print_table (void)
   for (i = 0; i < table_size; ++i) {
     if (symbol_table->data[i]) {
       char* key;
-      int* value;
+      symbol* entry;
 
       comp_dict_item_t* item = symbol_table->data[i];
       while(item) {
         key = item->key;
-        value = item->value;
+        entry = item->value;
 
-        cc_dict_etapa_1_print_entrada(key, *value);
+        cc_dict_etapa_2_print_entrada(key, entry->line, entry->type);
         item = item->next;
       }
     }
