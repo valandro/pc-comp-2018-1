@@ -80,6 +80,7 @@ TK_PR_PRIVATE |
 TK_PR_PUBLIC
 ;
 
+
 /* Regras de apoio - Fim */
 
 program: body ;
@@ -87,6 +88,7 @@ program: body ;
 body:
 body dec_var_new_type ';' |
 body dec_var_global ';' |
+body dec_func |
 ;
 
 dec_var_new_type:
@@ -113,5 +115,35 @@ TK_IDENTIFICADOR TK_IDENTIFICADOR
 
 vector:
 '[' TK_LIT_INT ']' |
+;
+
+dec_func:
+TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' func_body |
+type TK_IDENTIFICADOR '(' list_params ')' func_body
+;
+
+list_params:
+list_params ',' param |
+param |
+;
+
+param:
+type TK_IDENTIFICADOR |
+TK_PR_CONST type TK_IDENTIFICADOR
+;
+
+func_body:
+command_block
+;
+
+command_block:
+'{' simple_commands '}'
+;
+
+simple_commands:
+simple_commands ';' command |
+command
+;
+command:
 ;
 %%
