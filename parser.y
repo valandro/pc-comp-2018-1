@@ -65,13 +65,14 @@
 %left '+' '-'
 %left '*' '/'
 %right '['']'
-%right '('')'make
+%right '('')'
+
+%error-verbose
 
 %union
 {
   symbol* valor_lexico;
 }
-
 
 %start program
 %%
@@ -163,33 +164,38 @@ simple_commands:
 simple_commands ';' command |
 command
 ;
-command:
-command_block ';' |
-declare_var_local ';' |
-attribution ';' |
-input ';' |
-output ';' |
-shift ';' |
-func_call ';' |
-conditional ';' |
-iterative ';' |
-switch |
 
+command:
+command_block |
+declare_var_local |
+attribution |
+input |
+output  |
+shift  |
+func_call |
+conditional  |
+iterative |
+switch |
+control_flow |
 ;
 declare_var_local:
 TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR init|
 TK_PR_STATIC type TK_IDENTIFICADOR init|
+type TK_IDENTIFICADOR init|
 TK_PR_STATIC TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init|
-TK_PR_STATIC TK_IDENTIFICADOR TK_IDENTIFICADOR init
+TK_PR_STATIC TK_IDENTIFICADOR TK_IDENTIFICADOR init |
+TK_IDENTIFICADOR TK_IDENTIFICADOR init
+
 ;
 
 init:
 "<=" TK_IDENTIFICADOR |
-"<=" lit
+"<=" lit |
 ;
 
 attribution:
-dec_var_global '=' expression |
+TK_IDENTIFICADOR '=' expression |
+TK_IDENTIFICADOR '[' expression ']' '=' expression |
 TK_IDENTIFICADOR '.' TK_IDENTIFICADOR '=' expression
 ;
 
@@ -202,8 +208,8 @@ TK_PR_OUTPUT list_exp
 ;
 
 func_call:
-TK_IDENTIFICADOR '(' func_params ')' |
 TK_IDENTIFICADOR '('')' |
+TK_IDENTIFICADOR '(' func_params ')' |
 TK_IDENTIFICADOR '('')' TK_OC_U1 pipes_func |
 TK_IDENTIFICADOR '('')' TK_OC_U2 pipes_func
 ;
@@ -238,8 +244,8 @@ expression
 ;
 
 conditional:
-TK_PR_IF '(' expression ')' command_block |
-TK_PR_IF '(' expression ')' command_block TK_PR_ELSE command_block
+TK_PR_IF '(' expression ')' TK_PR_THEN command_block |
+TK_PR_IF '(' expression ')' TK_PR_THEN command_block TK_PR_ELSE command_block
 ;
 
 iterative:
@@ -253,10 +259,17 @@ switch:
 TK_PR_SWITCH '(' expression ')' command_block
 ;
 
+control_flow:
+TK_PR_RETURN expression |
+TK_PR_BREAK |
+TK_PR_CONTINUE |
+TK_PR_CASE TK_LIT_INT ':'
+;
+
 expression:
 '('expression')' |
 expression '*' expression |
-expression '+' expression |
+expression '+' expression {printf("ola");}|
 expression '-' expression |
 expression '/' expression |
 expression '>' expression |
