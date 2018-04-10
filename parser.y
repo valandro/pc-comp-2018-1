@@ -125,7 +125,10 @@ encap type TK_IDENTIFICADOR ;
 
 dec_var_global:
 declare vector |
-TK_PR_CLASS declare vector
+TK_PR_STATIC declare vector |
+TK_PR_CLASS declare vector |
+TK_PR_STATIC TK_PR_CLASS declare vector
+
 ;
 
 declare:
@@ -161,36 +164,32 @@ command_block:
 ;
 
 simple_commands:
-simple_commands ';' command |
-command
-;
-
-command:
-command_block |
-declare_var_local |
-attribution |
-input |
-output  |
-shift  |
-func_call |
-conditional  |
-iterative |
-switch |
-control_flow |
+simple_commands command_block ';'|
+simple_commands declare_var_local ';'|
+simple_commands attribution ';'|
+simple_commands input ';'';'|
+simple_commands output ';'|
+simple_commands shift  ';'|
+simple_commands func_call ';'|
+simple_commands conditional  ';'|
+simple_commands iterative ';'|
+simple_commands switch |
+simple_commands control_flow ';' |
 ;
 declare_var_local:
 TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR init|
 TK_PR_STATIC type TK_IDENTIFICADOR init|
+TK_PR_CONST type TK_IDENTIFICADOR init|
 type TK_IDENTIFICADOR init|
 TK_PR_STATIC TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init|
-TK_PR_STATIC TK_IDENTIFICADOR TK_IDENTIFICADOR init |
+TK_PR_STATIC TK_IDENTIFICADOR TK_IDENTIFICADOR init|
+TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init|
 TK_IDENTIFICADOR TK_IDENTIFICADOR init
-
 ;
 
 init:
-"<=" TK_IDENTIFICADOR |
-"<=" lit |
+TK_OC_LE TK_IDENTIFICADOR |
+TK_OC_LE lit |
 ;
 
 attribution:
@@ -234,8 +233,8 @@ pipes_exp:
 ;
 
 shift:
-TK_IDENTIFICADOR "<<" TK_LIT_INT |
-TK_IDENTIFICADOR ">>" TK_LIT_INT
+TK_IDENTIFICADOR TK_OC_SL TK_LIT_INT |
+TK_IDENTIFICADOR TK_OC_SR TK_LIT_INT
 ;
 
 list_exp:
@@ -269,7 +268,7 @@ TK_PR_CASE TK_LIT_INT ':'
 expression:
 '('expression')' |
 expression '*' expression |
-expression '+' expression {printf("ola");}|
+expression '+' expression |
 expression '-' expression |
 expression '/' expression |
 expression '>' expression |
