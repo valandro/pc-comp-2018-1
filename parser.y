@@ -210,7 +210,9 @@ func_call:
 TK_IDENTIFICADOR '('')' |
 TK_IDENTIFICADOR '(' func_params ')' |
 TK_IDENTIFICADOR '('')' TK_OC_U1 pipes_func |
-TK_IDENTIFICADOR '('')' TK_OC_U2 pipes_func
+TK_IDENTIFICADOR '(' func_params ')' TK_OC_U1 pipes_func |
+TK_IDENTIFICADOR '('')' TK_OC_U2 pipes_func |
+TK_IDENTIFICADOR '(' func_params ')' TK_OC_U2 pipes_func
 ;
 
 func_params:

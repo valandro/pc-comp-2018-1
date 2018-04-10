@@ -83,8 +83,8 @@ protected return TK_PR_PROTECTED;
 {SPECIAL_CHARACTER} return yytext[0];
 
   /* Literais */
-{LIT_TRUE} return TK_LIT_TRUE;
-{LIT_FALSE} return TK_LIT_FALSE;
+{LIT_TRUE} { yylval.valor_lexico = insert_symbol_table(TK_LIT_TRUE); return TK_LIT_TRUE; };
+{LIT_FALSE} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FALSE); return TK_LIT_FALSE; };
 {INTEGER} { yylval.valor_lexico = insert_symbol_table(TK_LIT_INT); return TK_LIT_INT;}
 {FLOAT} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
 {EXP_FLOAT} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }

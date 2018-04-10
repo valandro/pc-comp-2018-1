@@ -69,6 +69,14 @@ symbol* insert_symbol_table(int token) {
         element.type = POA_LIT_CHAR;
         element.value.c = (char) lexeme[0];
         break;
+      case TK_LIT_TRUE:
+        element.type = POA_LIT_BOOL;
+        element.value.b = true;
+        break;
+      case TK_LIT_FALSE:
+        element.type = POA_LIT_BOOL;
+        element.value.b = false;
+        break;
       case TK_LIT_STRING:
         element.type = POA_LIT_STRING;
         element.value.s = strdup(lexeme);

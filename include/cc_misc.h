@@ -3,10 +3,12 @@
 
 #include <string.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 union tValue {
   int i;
   float f;
+  bool b;
   char c;
   char* s;
 };
