@@ -269,6 +269,8 @@ TK_PR_CASE TK_LIT_INT ':'
 
 expression:
 '('expression')' |
+'-' expression |
+'+' expression |
 expression '*' expression |
 expression '+' expression |
 expression '-' expression |

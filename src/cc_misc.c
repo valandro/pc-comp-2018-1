@@ -24,6 +24,13 @@ int insertArray(symbolArray *a, symbol element) {
 }
 
 void freeArray(symbolArray *a) {
+  for(size_t i = 0; i < a->used; i++) {
+    if(a->array[i].type == TK_LIT_STRING || a->array[i].type == TK_IDENTIFICADOR) {
+      // Liberando string duplicada caso atribuída no símbolo.
+      free(a->array[i].value.s);
+    }
+  }
+
   free(a->array);
   a->array = NULL;
   a->used = a->size = 0;
