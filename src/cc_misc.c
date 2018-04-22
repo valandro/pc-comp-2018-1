@@ -41,16 +41,22 @@ int comp_get_line_number (void)
   return yylineno;
 }
 
-symbol* insert_symbol_table(int token) {
+symbol* insert_symbol_table(int token, int type) {
   char *lexeme = strdup(yytext);
   size_t i;
-
   // Caso char ou string, remover aspas da string.
   if(token == TK_LIT_CHAR || token == TK_LIT_STRING) {
     memmove(lexeme, lexeme + 1, strlen(lexeme)); //Remove o primeiro caracter ' ou "
     lexeme[strlen(lexeme) - 1] = '\0'; //Remove o último caracter ' ou "
   }
-
+  // Cast do tipo do token de int para char.
+  int int_value = type;
+  char c[10];
+  sprintf(c, "%d", int_value);
+  // Combinando valor da lexema com tipo do token, com $ como separador
+  strcat(lexeme, "$");
+  strcat(lexeme, c);
+  
   // Procurar o token na tabela de símbolos.
   // Se encontrado, atualiza o valor da última linha encontra.
   // Se não, insere na tabela.
@@ -96,7 +102,7 @@ symbol* insert_symbol_table(int token) {
         // No default behavior defined.
         break;
     }
-
+  
     i = insertArray(&symbol_data, element);
     foundEntry = &symbol_data.array[i];
     dict_put(symbol_table, lexeme, foundEntry);

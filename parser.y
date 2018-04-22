@@ -176,6 +176,7 @@ simple_commands iterative ';'|
 simple_commands switch |
 simple_commands control_flow ';' |
 ;
+
 declare_var_local:
 TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR init|
 TK_PR_STATIC type TK_IDENTIFICADOR init|

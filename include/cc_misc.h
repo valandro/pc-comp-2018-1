@@ -32,5 +32,5 @@ int getLineNumber (void);
 void yyerror (char const *mensagem);
 void main_init (int argc, char **argv);
 void main_finalize (void);
-symbol* insert_symbol_table(int token);
+symbol* insert_symbol_table(int token, int type);
 #endif

@@ -83,16 +83,16 @@ protected return TK_PR_PROTECTED;
 {SPECIAL_CHARACTER} return yytext[0];
 
   /* Literais */
-{LIT_TRUE} { yylval.valor_lexico = insert_symbol_table(TK_LIT_TRUE); return TK_LIT_TRUE; };
-{LIT_FALSE} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FALSE); return TK_LIT_FALSE; };
-{INTEGER} { yylval.valor_lexico = insert_symbol_table(TK_LIT_INT); return TK_LIT_INT;}
-{FLOAT} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
-{EXP_FLOAT} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FLOAT); return TK_LIT_FLOAT; }
-{LIT_CHAR} { yylval.valor_lexico = insert_symbol_table(TK_LIT_CHAR); return TK_LIT_CHAR; }
-{LIT_STRING} { yylval.valor_lexico = insert_symbol_table(TK_LIT_STRING); return TK_LIT_STRING; }
+{LIT_TRUE} { yylval.valor_lexico = insert_symbol_table(TK_LIT_TRUE, POA_LIT_BOOL); return TK_LIT_TRUE; };
+{LIT_FALSE} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FALSE, POA_LIT_BOOL); return TK_LIT_FALSE; };
+{INTEGER} { yylval.valor_lexico = insert_symbol_table(TK_LIT_INT, POA_LIT_INT); return TK_LIT_INT;}
+{FLOAT} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FLOAT, POA_LIT_FLOAT); return TK_LIT_FLOAT; }
+{EXP_FLOAT} { yylval.valor_lexico = insert_symbol_table(TK_LIT_FLOAT, POA_LIT_FLOAT); return TK_LIT_FLOAT; }
+{LIT_CHAR} { yylval.valor_lexico = insert_symbol_table(TK_LIT_CHAR, POA_LIT_CHAR); return TK_LIT_CHAR; }
+{LIT_STRING} { yylval.valor_lexico = insert_symbol_table(TK_LIT_STRING, POA_LIT_STRING); return TK_LIT_STRING; }
 
   /* Identificadores */
-{IDENTIFIER} { yylval.valor_lexico = insert_symbol_table(TK_IDENTIFICADOR); return TK_IDENTIFICADOR; }
+{IDENTIFIER} { yylval.valor_lexico = insert_symbol_table(TK_IDENTIFICADOR, POA_IDENT); return TK_IDENTIFICADOR; }
 
   /* Catch erro de númericos seguidos por identificadores */
 ({INTEGER}|{FLOAT}|{EXP_FLOAT}){IDENTIFIER}+ return TOKEN_ERRO;
