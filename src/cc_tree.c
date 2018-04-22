@@ -17,6 +17,8 @@
 #include <stdlib.h>
 
 #include "cc_tree.h"
+#include "cc_misc.h"
+
 
 extern FILE *intfp;
 void *comp_tree_last = NULL;
@@ -68,10 +70,24 @@ void tree_insert_node(comp_tree_t *tree, comp_tree_t *node){
 		tree->last = node;
 	}
 	++tree->childnodes;
+	
+	ast_node_t* tree_ast = (ast_node_t*)(tree->value);
+	int type = tree_ast->type;
+	if (type == AST_IDENTIFICADOR || type == AST_FUNCAO || type == AST_LITERAL) {
+		gv_declare(type, tree, tree_ast->value.data->value.s);
+	} else {
+		gv_declare(type, tree, NULL);
+	}
 
-	fprintf (intfp, "node_%p [label=\"\"]\n", tree);
-	fprintf (intfp, "node_%p [label=\"\"]\n", node);
-	fprintf (intfp, "node_%p -> node_%p\n", tree, node);
+	ast_node_t* node_ast = (ast_node_t*)(node->value);
+	type = node_ast->type;
+	if (type == AST_IDENTIFICADOR || type == AST_FUNCAO || type == AST_LITERAL) {
+		gv_declare(type, node, node_ast->value.data->value.s);
+	} else {
+		gv_declare(type, node, NULL);
+	}
+	gv_connect(tree,node);
+
 	comp_tree_last = tree;
 }
 

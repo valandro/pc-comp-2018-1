@@ -25,6 +25,15 @@ typedef struct {
   size_t size;
 } symbolArray;
 
+typedef struct ast_node
+{
+    int type;
+    union
+    {
+      symbol* data;
+    } value;
+} ast_node_t;
+
 #include "parser.h"
 #include "cc_dict.h"
 

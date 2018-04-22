@@ -83,7 +83,7 @@ static inline char *__gv_description_from_type (int tipo)
 }
 
 /**
- * gv_init 
+ * gv_init
  *
  * Esta função deve ser chamada para inicializar o arquivo onde o
  * grafo será registrado. Um nome de arquivo, opcional, pode ser
@@ -96,24 +96,23 @@ void gv_init (const char *filename)
   if (fp){
     fprintf (stderr, "%s:%d já foi chamada, abort()\n", __FUNCTION__, __LINE__);
     abort();
-
   }
 
   //se o nome do arquivo for válido, abre arquivo com esse nome para escrita
-  if (filename){
+ if (filename){
     fp = fopen (filename, "w");
     if (!fp){
-      fprintf (stderr, "%s:%d não conseguiu abrir o arquivo %s para escrita\n", __FUNCTION__, __LINE__, filename);
-      abort();
+     fprintf (stderr, "%s:%d não conseguiu abrir o arquivo %s para escrita\n", __FUNCTION__, __LINE__, filename);
+     abort();
     }
-  }else{
-    fp = stderr;    
   }
+  else{
+    fp = stderr;
+  }
+//  intfp = fp;
   fprintf (fp, "digraph G {\n");
-
   intfp = fopen(INTERNAL_OUTPUT, "w");
-  fprintf(intfp, "digraph G {\n");
-  fprintf(intfp, "  root [label=\"root\"]\n");
+  // fprintf(intfp, "digraph G {\n");
 }
 
 /**
@@ -125,12 +124,10 @@ void gv_init (const char *filename)
 void gv_close (void)
 {
   __gv_test_valid_fp (__FUNCTION__);
-  fprintf (fp, "}\n");
+  // fprintf (fp, "}\n");
+
+  fprintf(fp, "}\n");
   fclose(fp);
-  if (comp_tree_last){
-    fprintf(intfp, "root -> node_%p\n", comp_tree_last);
-  }
-  fprintf(intfp, "}\n");
   fclose(intfp);
 }
 
@@ -138,14 +135,14 @@ void gv_close (void)
  * gv_declare
  *
  * Esta função deve ser chamada para declarar um nó da AST,
- * registrando esse novo nó no arquivo. Ela tem três parâmetros: 
+ * registrando esse novo nó no arquivo. Ela tem três parâmetros:
 
  * 1/ tipo, que deve ser obrigatoriamente um dos valores das
- * constantes declaradas no arquivo iks_ast.h; 
+ * constantes declaradas no arquivo iks_ast.h;
 
  * 2/ pointer, que deve ser um pointeiro para o nó da árvore AST que
  * está sendo declarado servindo a partir de agora como identificador
- * único do nó; e 
+ * único do nó; e
 
  * 3/ name, que deve ser um lexema válido somente se o tipo for um
  * desses três valores: AST_IDENTIFICADOR (o lexema do
@@ -158,6 +155,8 @@ void gv_declare (const int tipo, const void *pointer, char *name)
   __gv_test_valid_ast_pointer (__FUNCTION__, pointer);
 
   char *description = NULL;
+
+//  fprintf (stderr, "%s: tipo: %d, name: %s \n", __FUNCTION__, tipo, name);
 
   switch (tipo){
   case AST_FUNCAO:
@@ -205,7 +204,7 @@ void gv_declare (const int tipo, const void *pointer, char *name)
     break;
 
   default:
-    fprintf (stderr, "%s: unknow tipo provided\n", __FUNCTION__);
+    fprintf (stderr, "%s: unknow tipo provided: %d, name: %s \n", __FUNCTION__, tipo, name);
     abort();
   }
 

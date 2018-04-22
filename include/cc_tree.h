@@ -16,6 +16,7 @@
 #ifndef CC_TREE_H_
 #define CC_TREE_H_
 
+
 /*
  * Tipo: comp_tree_t, value é um tipo genérico armazenado em cada
  * nó da árvore, childnodes é a quantidade de nós filhos de um nó,

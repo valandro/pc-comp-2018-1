@@ -3,6 +3,8 @@
 */
 %code requires{
 #include "main.h"
+#include "cc_tree.h"
+comp_tree_t* tree;
 }
 
 /* Declaração dos tokens da linguagem */
@@ -68,10 +70,14 @@
 %right '('')'
 
 %error-verbose
-
+%type <node> program
+%type <node> body
+%type <node> dec_func
+%type <valor_lexico> TK_IDENTIFICADOR
 %union
 {
   symbol* valor_lexico;
+  comp_tree_t* node;
 }
 
 %start program
@@ -103,12 +109,26 @@ TK_LIT_STRING
 
 /* Regras de apoio - Fim */
 
-program: body ;
+program: body {
+  ast_node_t* node = malloc(sizeof(ast_node_t));
+  node->type = AST_PROGRAMA;
+
+  tree = tree_make_node((void*)node);
+  $$ = tree;
+
+  if ($1 != NULL){
+    tree_insert_node($$,$1);
+  }
+}
+;
 
 body:
-body dec_var_new_type ';' |
+body dec_var_new_type ';'|
 body dec_var_global ';' |
-body dec_func |
+body dec_func {
+  $$ = $2;
+}|
+/* empty */ {$$ = NULL;}
 ;
 
 dec_var_new_type:
@@ -141,8 +161,18 @@ vector:
 ;
 
 dec_func:
-TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' func_body |
-type TK_IDENTIFICADOR '(' list_params ')' func_body
+TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' func_body {
+  ast_node_t *node = malloc(sizeof(ast_node_t));
+  node->type = AST_FUNCAO;
+  node->value.data = $3;
+  $$ = tree_make_node((void*)node);  
+}|
+type TK_IDENTIFICADOR '(' list_params ')' func_body {
+  ast_node_t *node = malloc(sizeof(ast_node_t));
+  node->type = AST_FUNCAO;
+  node->value.data = $2;
+  $$ = tree_make_node((void*)node);
+}
 ;
 
 list_params:
