@@ -5,8 +5,12 @@
 #include "main.h"
 #include "cc_tree.h"
 comp_tree_t* tree;
+comp_tree_t* last_function;
 }
-
+// Inicializando contador que identifica a primeira função
+%{
+  int count = 0;
+%}
 /* Declaração dos tokens da linguagem */
 /* Palavras Reservadas */
 %token TK_PR_INT
@@ -126,7 +130,22 @@ body:
 body dec_var_new_type ';'|
 body dec_var_global ';' |
 body dec_func {
-  $$ = $2;
+  comp_tree_t* first;
+
+  $$ = first;
+  //Se não for a primeira função, concatena na ultima função
+  if(count > 0) {
+    tree_insert_node(last_function,$2);
+  }
+
+  last_function = $2;
+  count++;
+
+  if(count == 1){
+    first = $2;
+    $$ = $2;
+  }
+
 }|
 /* empty */ {$$ = NULL;}
 ;
