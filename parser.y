@@ -88,7 +88,7 @@ comp_tree_t* last_function;
 %type <node> list_exp
 %type <node> func_params
 %type <node> func_call
-
+%type <node> iterative
 
 %type <valor_lexico> TK_LIT_INT
 %type <valor_lexico> TK_LIT_FLOAT
@@ -290,9 +290,27 @@ simple_commands shift  ';' {
    $$->last = $2;
   }
 }|
-simple_commands func_call ';'|
+simple_commands func_call ';' {
+  if($$ == NULL){
+   $$ = $2;
+   $$->last = $2;
+  }
+  else if($2 != NULL){
+   tree_insert_node($$->last,$2);
+   $$->last = $2;
+  }
+}|
 simple_commands conditional  ';'|
-simple_commands iterative ';'|
+simple_commands iterative ';' {
+  if($$ == NULL){
+   $$ = $2;
+   $$->last = $2;
+  }
+  else if($2 != NULL){
+   tree_insert_node($$->last,$2);
+   $$->last = $2;
+  }
+}|
 simple_commands switch |
 simple_commands control_flow ';' {
   if($$ == NULL){
@@ -505,8 +523,26 @@ TK_PR_IF '(' expression ')' TK_PR_THEN command_block TK_PR_ELSE command_block
 iterative:
 TK_PR_FOREACH '(' TK_IDENTIFICADOR ':' list_exp ')' command_block |
 TK_PR_FOR '(' list_exp ':' expression ':' list_exp ')' command_block |
-TK_PR_WHILE '(' expression ')' TK_PR_DO command_block |
-TK_PR_DO command_block TK_PR_WHILE '(' expression ')'
+TK_PR_WHILE '(' expression ')' TK_PR_DO '{' simple_commands '}' {
+  ast_node_t *while_value = malloc(sizeof(ast_node_t));
+  while_value->type = AST_WHILE_DO;
+
+  comp_tree_t* while_tree_node = tree_make_node((void*)while_value);
+  tree_insert_node(while_tree_node, $3);
+  tree_insert_node(while_tree_node, $7);
+
+  $$ = while_tree_node;
+}|
+TK_PR_DO '{' simple_commands '}' TK_PR_WHILE '(' expression ')' {
+  ast_node_t *while_value = malloc(sizeof(ast_node_t));
+  while_value->type = AST_DO_WHILE;
+
+  comp_tree_t* while_tree_node = tree_make_node((void*)while_value);
+  tree_insert_node(while_tree_node, $3);
+  tree_insert_node(while_tree_node, $7);
+
+  $$ = while_tree_node;
+}
 ;
 
 switch:
