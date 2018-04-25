@@ -89,6 +89,7 @@ comp_tree_t* last_function;
 %type <node> func_params
 %type <node> func_call
 %type <node> iterative
+%type <node> conditional
 
 %type <valor_lexico> TK_LIT_INT
 %type <valor_lexico> TK_LIT_FLOAT
@@ -300,7 +301,16 @@ simple_commands func_call ';' {
    $$->last = $2;
   }
 }|
-simple_commands conditional  ';'|
+simple_commands conditional  ';' {
+  if($$ == NULL){
+   $$ = $2;
+   $$->last = $2;
+  }
+  else if($2 != NULL){
+   tree_insert_node($$->last,$2);
+   $$->last = $2;
+  }
+}|
 simple_commands iterative ';' {
   if($$ == NULL){
    $$ = $2;
@@ -516,8 +526,35 @@ expression
 ;
 
 conditional:
-TK_PR_IF '(' expression ')' TK_PR_THEN command_block |
-TK_PR_IF '(' expression ')' TK_PR_THEN command_block TK_PR_ELSE command_block
+TK_PR_IF '(' expression ')' TK_PR_THEN '{' simple_commands '}' {
+  ast_node_t *if_then_value = malloc(sizeof(ast_node_t));
+  if_then_value->type = AST_IF_ELSE;
+
+  comp_tree_t* if_then_tree_node = tree_make_node((void*)if_then_value);
+
+  ast_node_t *t = $3->value;
+  tree_insert_node(if_then_tree_node, $3);
+  if ($7 != NULL) {
+    tree_insert_node(if_then_tree_node, $7);
+  }
+  $$ = if_then_tree_node;
+}|
+TK_PR_IF '(' expression ')' TK_PR_THEN '{' simple_commands '}' TK_PR_ELSE '{' simple_commands '}' {
+  ast_node_t *if_then_value = malloc(sizeof(ast_node_t));
+  if_then_value->type = AST_IF_ELSE;
+
+  comp_tree_t* if_then_tree_node = tree_make_node((void*)if_then_value);
+  
+  tree_insert_node(if_then_tree_node, $3);
+
+  if ($7 != NULL) {
+    tree_insert_node(if_then_tree_node, $7);
+  }
+  if ($11 != NULL) {
+    tree_insert_node(if_then_tree_node, $11);
+  }
+  $$ = if_then_tree_node;
+}
 ;
 
 iterative:
