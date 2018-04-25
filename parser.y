@@ -86,6 +86,9 @@ comp_tree_t* last_function;
 %type <node> input
 %type <node> output
 %type <node> list_exp
+%type <node> func_params
+%type <node> func_call
+
 
 %type <valor_lexico> TK_LIT_INT
 %type <valor_lexico> TK_LIT_FLOAT
@@ -215,7 +218,7 @@ type TK_IDENTIFICADOR '(' list_params ')' '{' simple_commands '}' {
 ;
 
 list_params:
-list_params ',' param |
+param ',' list_params |
 param |
 ;
 
@@ -388,8 +391,32 @@ TK_PR_OUTPUT list_exp {
 ;
 
 func_call:
-TK_IDENTIFICADOR '('')' |
-TK_IDENTIFICADOR '(' func_params ')' |
+TK_IDENTIFICADOR '(' ')' {
+  ast_node_t *node = malloc(sizeof(ast_node_t));
+  node->type = AST_CHAMADA_DE_FUNCAO;
+
+  ast_node_t *ident = malloc(sizeof(ast_node_t));
+  ident->type = AST_IDENTIFICADOR;
+  ident->value.data = $1;
+
+  comp_tree_t* ident_tree = tree_make_node((void*)ident);
+
+  $$ = tree_make_unary_node((void*)node,ident_tree);
+  
+}|
+TK_IDENTIFICADOR '(' func_params ')' {
+  ast_node_t *node = malloc(sizeof(ast_node_t));
+  node->type = AST_CHAMADA_DE_FUNCAO;
+
+  ast_node_t *ident = malloc(sizeof(ast_node_t));
+  ident->type = AST_IDENTIFICADOR;
+  ident->value.data = $1;
+
+  comp_tree_t* ident_tree = tree_make_node((void*)ident);
+
+  $$ = tree_make_binary_node((void*)node,ident_tree,$3);
+  
+}|
 TK_IDENTIFICADOR '('')' TK_OC_U1 pipes_func |
 TK_IDENTIFICADOR '(' func_params ')' TK_OC_U1 pipes_func |
 TK_IDENTIFICADOR '('')' TK_OC_U2 pipes_func |
@@ -397,7 +424,11 @@ TK_IDENTIFICADOR '(' func_params ')' TK_OC_U2 pipes_func
 ;
 
 func_params:
-func_params ',' expression |
+expression ',' func_params {
+  if($3 != NULL){
+   tree_insert_node($$,$3);   
+  }
+}|
 expression
 ;
 
@@ -591,6 +622,7 @@ TK_LIT_FLOAT {
   
   $$ = tree_make_node((void*)node);
 }|
+func_call {$$ = $1;}|
 TK_IDENTIFICADOR {
   ast_node_t *node = malloc(sizeof(ast_node_t));
   node->type = AST_IDENTIFICADOR;
