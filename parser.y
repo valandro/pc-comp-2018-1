@@ -82,6 +82,7 @@ comp_tree_t* last_function;
 %type <node> attribution
 %type <node> expression
 %type <node> control_flow
+%type <node> shift
 
 %type <valor_lexico> TK_LIT_INT
 %type <valor_lexico> TK_LIT_FLOAT
@@ -255,7 +256,16 @@ simple_commands attribution ';' {
 }|
 simple_commands input ';'';'|
 simple_commands output ';'|
-simple_commands shift  ';'|
+simple_commands shift  ';' {
+  if($$ == NULL){
+   $$ = $2;
+   $$->last = $2;
+  }
+  else {
+   tree_insert_node($$->last,$2);
+   $$->last = $2;
+  }
+}|
 simple_commands func_call ';'|
 simple_commands conditional  ';'|
 simple_commands iterative ';'|
@@ -377,8 +387,45 @@ pipes_exp:
 ;
 
 shift:
-TK_IDENTIFICADOR TK_OC_SL TK_LIT_INT |
-TK_IDENTIFICADOR TK_OC_SR TK_LIT_INT
+TK_IDENTIFICADOR TK_OC_SL TK_LIT_INT {
+  ast_node_t *ident = malloc(sizeof(ast_node_t));
+  ident->type = AST_IDENTIFICADOR;
+  ident->value.data = $1;
+  
+  comp_tree_t* ident_node = tree_make_node((void*)ident);
+
+  ast_node_t *lit = malloc(sizeof(ast_node_t));
+    
+  lit->type = AST_LITERAL;
+  lit->value.data = $3;
+  
+  comp_tree_t* int_node = tree_make_node((void*)lit);
+
+  ast_node_t *node = malloc(sizeof(ast_node_t));
+  node->type = AST_SHIFT_LEFT;
+
+  $$ = tree_make_binary_node((void*)node, ident_node, int_node);
+
+}|
+TK_IDENTIFICADOR TK_OC_SR TK_LIT_INT {
+    ast_node_t *ident = malloc(sizeof(ast_node_t));
+  ident->type = AST_IDENTIFICADOR;
+  ident->value.data = $1;
+  
+  comp_tree_t* ident_node = tree_make_node((void*)ident);
+
+  ast_node_t *lit = malloc(sizeof(ast_node_t));
+    
+  lit->type = AST_LITERAL;
+  lit->value.data = $3;
+  
+  comp_tree_t* int_node = tree_make_node((void*)lit);
+
+  ast_node_t *node = malloc(sizeof(ast_node_t));
+  node->type = AST_SHIFT_RIGHT;
+
+  $$ = tree_make_binary_node((void*)node, ident_node, int_node);
+}
 ;
 
 list_exp:
