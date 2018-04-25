@@ -81,9 +81,10 @@ comp_tree_t* last_function;
 %type <node> simple_commands
 %type <node> attribution
 %type <node> expression
+%type <node> control_flow
+
 %type <valor_lexico> TK_LIT_INT
 %type <valor_lexico> TK_LIT_FLOAT
-
 %type <valor_lexico> TK_IDENTIFICADOR
 
 
@@ -259,7 +260,16 @@ simple_commands func_call ';'|
 simple_commands conditional  ';'|
 simple_commands iterative ';'|
 simple_commands switch |
-simple_commands control_flow ';' |
+simple_commands control_flow ';' {
+  if($$ == NULL){
+   $$ = $2;
+   $$->last = $2;
+  }
+  else if($2 != NULL){
+   tree_insert_node($$->last,$2);
+   $$->last = $2;
+  }
+}|
 /* empty */ {$$ = NULL;}
 ;
 
@@ -393,10 +403,20 @@ TK_PR_SWITCH '(' expression ')' command_block
 ;
 
 control_flow:
-TK_PR_RETURN expression |
-TK_PR_BREAK |
-TK_PR_CONTINUE |
-TK_PR_CASE TK_LIT_INT ':'
+TK_PR_RETURN expression {
+  ast_node_t *ast_return = malloc(sizeof(ast_node_t));
+  ast_return->type = AST_RETURN;
+  $$ = tree_make_unary_node((void*)ast_return, $2);
+}|
+TK_PR_BREAK {
+  $$ = NULL;
+}|
+TK_PR_CONTINUE {
+  $$ = NULL;
+}|
+TK_PR_CASE TK_LIT_INT ':' {
+  $$ = NULL;
+}
 ;
 
 expression:
