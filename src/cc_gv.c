@@ -73,6 +73,7 @@ static inline char *__gv_description_from_type (int tipo)
   case AST_CHAMADA_DE_FUNCAO: return "call";
   case AST_SHIFT_LEFT: return "<<";
   case AST_SHIFT_RIGHT: return ">>";
+  case AST_TIPO_CAMPO: return ".";  
 
   default:
     fprintf (stderr, "%s: tipo provided is invalid here\n", __FUNCTION__);
@@ -196,6 +197,7 @@ void gv_declare (const int tipo, const void *pointer, char *name)
   case AST_CHAMADA_DE_FUNCAO:
   case AST_SHIFT_LEFT:
   case AST_SHIFT_RIGHT:
+  case AST_TIPO_CAMPO:
     if (name){
       fprintf (stderr, "%s: name should be NULL\n", __FUNCTION__);
       abort();

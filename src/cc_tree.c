@@ -73,6 +73,7 @@ void tree_insert_node(comp_tree_t *tree, comp_tree_t *node){
 	
 	ast_node_t* tree_ast = (ast_node_t*)(tree->value);
 	int type = tree_ast->type;
+
 	if (type == AST_IDENTIFICADOR || type == AST_FUNCAO || type == AST_LITERAL) {
 		gv_declare(type, tree, tree_ast->value.data->value.s);
 	} else {
@@ -81,8 +82,35 @@ void tree_insert_node(comp_tree_t *tree, comp_tree_t *node){
 
 	ast_node_t* node_ast = (ast_node_t*)(node->value);
 	type = node_ast->type;
-	if (type == AST_IDENTIFICADOR || type == AST_FUNCAO || type == AST_LITERAL) {
+	
+	if (type == AST_IDENTIFICADOR || type == AST_FUNCAO) {
 		gv_declare(type, node, node_ast->value.data->value.s);
+	} else if(type == AST_LITERAL) {
+		switch (node_ast->value.data->type){
+			case 1: {
+				int Int = node_ast->value.data->value.i;
+				char str[12];
+				sprintf(str, "%d", Int);
+				gv_declare(type, node, str);
+				break;
+			}
+			case 2: {
+				float Float = node_ast->value.data->value.f;
+				char str[50];
+				sprintf(str, "%f", Float);
+				gv_declare(type, node, str);
+				break;	
+			}
+			case 5: {
+				if(node_ast->value.data->value.b == true){
+					gv_declare(type, node, "true");
+				} else {
+					gv_declare(type, node, "false");					
+				}
+				break;
+			}
+			default: break;
+		}		
 	} else {
 		gv_declare(type, node, NULL);
 	}

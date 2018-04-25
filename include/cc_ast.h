@@ -43,4 +43,5 @@
 #define AST_FOR                 33
 #define AST_FOREACH             34
 #define AST_SWITCH              35
+#define AST_TIPO_CAMPO          36 // identificador.campo = exp
 #endif
