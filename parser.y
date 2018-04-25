@@ -83,6 +83,7 @@ comp_tree_t* last_function;
 %type <node> expression
 %type <node> control_flow
 %type <node> shift
+%type <node> input
 
 %type <valor_lexico> TK_LIT_INT
 %type <valor_lexico> TK_LIT_FLOAT
@@ -254,7 +255,16 @@ simple_commands attribution ';' {
    $$->last = $2;
   }
 }|
-simple_commands input ';'';'|
+simple_commands input ';' {
+  if($$ == NULL){
+   $$ = $2;
+   $$->last = $2;
+  }
+  else {
+   tree_insert_node($$->last,$2);
+   $$->last = $2;
+  }
+}|
 simple_commands output ';'|
 simple_commands shift  ';' {
   if($$ == NULL){
@@ -351,7 +361,11 @@ TK_IDENTIFICADOR '.' TK_IDENTIFICADOR '=' expression {
 ;
 
 input:
-TK_PR_INPUT expression
+TK_PR_INPUT expression {
+  ast_node_t *ast_return = malloc(sizeof(ast_node_t));
+  ast_return->type = AST_INPUT;
+  $$ = tree_make_unary_node((void*)ast_return, $2);
+}
 ;
 
 output:
