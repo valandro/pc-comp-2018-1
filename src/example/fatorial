@@ -1,0 +1,30 @@
+int fatorial_recursivo (int n) {
+  if(n == 0) then {
+    return 1;
+  } else {
+    return n * fatorial_recursivo(n - 1);
+  };
+}
+
+int fatorial_iterativo (int n) {
+  int resultado;
+  resultado = n;
+
+  if (n == 0) then {
+    resultado = resultado + 1;
+  };
+
+  while (n > 1) do {
+    n = n - 1;
+    resultado = resultado * n;
+  };
+
+  return resultado;
+}
+
+int main () {
+  int numero;
+  numero = 3;
+
+  return fatorial_iterativo(numero);
+}
