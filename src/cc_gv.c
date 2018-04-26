@@ -79,7 +79,7 @@ static inline char *__gv_description_from_type (int tipo)
   case AST_TIPO_CAMPO: return ".";  
   case AST_PIPE_R1: return "%>%";  
   case AST_PIPE_R2: return "%|%";  
-
+  case AST_DEC_INIT: return "init";
   default:
     fprintf (stderr, "%s: tipo provided is invalid here\n", __FUNCTION__);
     abort();
@@ -207,7 +207,8 @@ void gv_declare (const int tipo, const void *pointer, char *name)
   case AST_SWITCH:  
   case AST_TIPO_CAMPO:
   case AST_PIPE_R1:
-  case AST_PIPE_R2:  
+  case AST_PIPE_R2:
+  case AST_DEC_INIT:  
     if (name){
       fprintf (stderr, "%s: name should be NULL\n", __FUNCTION__);
       abort();

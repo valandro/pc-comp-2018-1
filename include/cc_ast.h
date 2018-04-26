@@ -46,5 +46,5 @@
 #define AST_TIPO_CAMPO          36 // identificador.campo = exp
 #define AST_PIPE_R1             37 // %>%
 #define AST_PIPE_R2             38 // %|%
-
+#define AST_DEC_INIT            39 // init
 #endif
