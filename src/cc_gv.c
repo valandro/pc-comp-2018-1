@@ -74,7 +74,8 @@ static inline char *__gv_description_from_type (int tipo)
   case AST_SHIFT_LEFT: return "<<";
   case AST_SHIFT_RIGHT: return ">>";
   case AST_FOR: return "for";
-  case AST_FOREACH: return "foreach";      
+  case AST_FOREACH: return "foreach"; 
+  case AST_SWITCH: return "switch";     
   case AST_TIPO_CAMPO: return ".";  
   case AST_PIPE_R1: return "%>%";  
   case AST_PIPE_R2: return "%|%";  
@@ -202,7 +203,8 @@ void gv_declare (const int tipo, const void *pointer, char *name)
   case AST_SHIFT_LEFT:
   case AST_SHIFT_RIGHT:
   case AST_FOR:
-  case AST_FOREACH:  
+  case AST_FOREACH:
+  case AST_SWITCH:  
   case AST_TIPO_CAMPO:
   case AST_PIPE_R1:
   case AST_PIPE_R2:  

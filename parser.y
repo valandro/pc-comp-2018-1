@@ -90,6 +90,7 @@ comp_tree_t* last_function;
 %type <node> func_call
 %type <node> iterative
 %type <node> conditional
+%type <node> switch
 
 %type <valor_lexico> TK_LIT_INT
 %type <valor_lexico> TK_LIT_FLOAT
@@ -321,7 +322,16 @@ simple_commands iterative ';' {
    $$->last = $2;
   }
 }|
-simple_commands switch |
+simple_commands switch {
+  if($$ == NULL){
+   $$ = $2;
+   $$->last = $2;
+  }
+  else {
+   tree_insert_node($$->last,$2);
+   $$->last = $2;
+  }
+}|
 simple_commands control_flow ';' {
   if($$ == NULL){
    $$ = $2;
@@ -445,10 +455,10 @@ TK_IDENTIFICADOR '(' func_params ')' {
   $$ = tree_make_binary_node((void*)node,ident_tree,$3);
   
 }|
-TK_IDENTIFICADOR '('')' TK_OC_U1 pipes_func |
-TK_IDENTIFICADOR '(' func_params ')' TK_OC_U1 pipes_func |
-TK_IDENTIFICADOR '('')' TK_OC_U2 pipes_func |
-TK_IDENTIFICADOR '(' func_params ')' TK_OC_U2 pipes_func
+TK_IDENTIFICADOR '('')' TK_OC_U1 pipes_func {$$ = NULL;}|
+TK_IDENTIFICADOR '(' func_params ')' TK_OC_U1 pipes_func {$$ = NULL;}|
+TK_IDENTIFICADOR '('')' TK_OC_U2 pipes_func {$$ = NULL;}|
+TK_IDENTIFICADOR '(' func_params ')' TK_OC_U2 pipes_func {$$ = NULL;}
 ;
 
 func_params:
@@ -610,7 +620,20 @@ TK_PR_DO '{' simple_commands '}' TK_PR_WHILE '(' expression ')' {
 ;
 
 switch:
-TK_PR_SWITCH '(' expression ')' '{' simple_commands '}'
+TK_PR_SWITCH '(' expression ')' '{' simple_commands '}' {
+  ast_node_t *switch_value = malloc(sizeof(ast_node_t));
+  switch_value->type = AST_SWITCH;
+
+  comp_tree_t* switch_tree_node = tree_make_node((void*)switch_value);
+
+  if($3 != NULL){
+    tree_insert_node(switch_tree_node,$3);
+  }
+  if($6 != NULL){
+    tree_insert_node(switch_tree_node,$6);
+  }
+  $$ = switch_tree_node;
+}
 ;
 
 control_flow:
