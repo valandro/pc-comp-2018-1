@@ -496,7 +496,7 @@ TK_IDENTIFICADOR TK_OC_SL TK_LIT_INT {
 
 }|
 TK_IDENTIFICADOR TK_OC_SR TK_LIT_INT {
-    ast_node_t *ident = malloc(sizeof(ast_node_t));
+  ast_node_t *ident = malloc(sizeof(ast_node_t));
   ident->type = AST_IDENTIFICADOR;
   ident->value.data = $1;
   
@@ -556,10 +556,25 @@ TK_PR_IF '(' expression ')' TK_PR_THEN '{' simple_commands '}' TK_PR_ELSE '{' si
 ;
 
 iterative:
-TK_PR_FOREACH '(' TK_IDENTIFICADOR ':' list_exp ')' command_block {
+TK_PR_FOREACH '(' TK_IDENTIFICADOR ':' list_exp ')' '{' simple_commands '}' {
+  ast_node_t *foreach_value = malloc(sizeof(ast_node_t));
+  foreach_value->type = AST_FOREACH;
 
+  ast_node_t *ident = malloc(sizeof(ast_node_t));
+  ident->type = AST_IDENTIFICADOR;
+  ident->value.data = $3;
+
+  comp_tree_t* ident_node = tree_make_node((void*)ident);
+
+  comp_tree_t* foreach_tree_node = tree_make_node((void*)foreach_value);
+
+  tree_insert_node(foreach_tree_node,$5);
+  tree_insert_node(foreach_tree_node,$8);
+  tree_insert_node(foreach_tree_node,ident_node);
+
+  $$ = foreach_tree_node;
 }|
-TK_PR_FOR '(' list_exp ':' expression ':' list_exp ')''{' simple_commands '}' {
+TK_PR_FOR '(' list_exp ':' expression ':' list_exp ')' '{' simple_commands '}' {
   ast_node_t *for_value = malloc(sizeof(ast_node_t));
   for_value->type = AST_FOR;
 
@@ -595,7 +610,7 @@ TK_PR_DO '{' simple_commands '}' TK_PR_WHILE '(' expression ')' {
 ;
 
 switch:
-TK_PR_SWITCH '(' expression ')' command_block
+TK_PR_SWITCH '(' expression ')' '{' simple_commands '}'
 ;
 
 control_flow:
