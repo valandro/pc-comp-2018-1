@@ -544,9 +544,7 @@ TK_PR_IF '(' expression ')' TK_PR_THEN '{' simple_commands '}' TK_PR_ELSE '{' si
   if_then_value->type = AST_IF_ELSE;
 
   comp_tree_t* if_then_tree_node = tree_make_node((void*)if_then_value);
-  
   tree_insert_node(if_then_tree_node, $3);
-
   if ($7 != NULL) {
     tree_insert_node(if_then_tree_node, $7);
   }
@@ -558,8 +556,22 @@ TK_PR_IF '(' expression ')' TK_PR_THEN '{' simple_commands '}' TK_PR_ELSE '{' si
 ;
 
 iterative:
-TK_PR_FOREACH '(' TK_IDENTIFICADOR ':' list_exp ')' command_block |
-TK_PR_FOR '(' list_exp ':' expression ':' list_exp ')' command_block |
+TK_PR_FOREACH '(' TK_IDENTIFICADOR ':' list_exp ')' command_block {
+
+}|
+TK_PR_FOR '(' list_exp ':' expression ':' list_exp ')''{' simple_commands '}' {
+  ast_node_t *for_value = malloc(sizeof(ast_node_t));
+  for_value->type = AST_FOR;
+
+  comp_tree_t* for_tree_node = tree_make_node((void*)for_value);
+
+  tree_insert_node(for_tree_node,$3);
+  tree_insert_node(for_tree_node,$5);
+  tree_insert_node(for_tree_node,$7);
+  tree_insert_node(for_tree_node,$10);  
+
+  $$ = for_tree_node;
+}|
 TK_PR_WHILE '(' expression ')' TK_PR_DO '{' simple_commands '}' {
   ast_node_t *while_value = malloc(sizeof(ast_node_t));
   while_value->type = AST_WHILE_DO;

@@ -44,4 +44,7 @@
 #define AST_FOREACH             34
 #define AST_SWITCH              35
 #define AST_TIPO_CAMPO          36 // identificador.campo = exp
+#define AST_PIPE_R1             37 // %>%
+#define AST_PIPE_R2             38 // %|%
+
 #endif
