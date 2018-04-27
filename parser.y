@@ -6,10 +6,13 @@
 #include "cc_tree.h"
 comp_tree_t* tree;
 comp_tree_t* last_function;
+comp_tree_t* list_exp;
+
 }
 // Inicializando contador que identifica a primeira função
 %{
   int count = 0;
+  int pcount = 0;  
 %}
 /* Declaração dos tokens da linguagem */
 /* Palavras Reservadas */
@@ -93,6 +96,8 @@ comp_tree_t* last_function;
 %type <node> switch
 %type <node> init
 %type <node> declare_var_local
+%type <node> pipes_exp
+%type <node> pipes_func
 
 %type <valor_lexico> lit
 %type <valor_lexico> TK_LIT_INT
@@ -589,9 +594,32 @@ TK_IDENTIFICADOR '(' func_params ')' {
   $$ = tree_make_binary_node((void*)node,ident_tree,$3);
   
 }|
-TK_IDENTIFICADOR '('')' TK_OC_U1 pipes_func {$$ = NULL;}|
+TK_IDENTIFICADOR '('')' TK_OC_U1 pipes_func {
+  ast_node_t *node = malloc(sizeof(ast_node_t));
+  node->type = AST_PIPE_R1;
+
+  ast_node_t *ident = malloc(sizeof(ast_node_t));
+  ident->type = AST_IDENTIFICADOR;
+  ident->value.data = $1;
+
+  comp_tree_t* ident_tree = tree_make_node((void*)ident);
+
+  $$ = tree_make_binary_node((void*)node,ident_tree,$5);
+
+}|
 TK_IDENTIFICADOR '(' func_params ')' TK_OC_U1 pipes_func {$$ = NULL;}|
-TK_IDENTIFICADOR '('')' TK_OC_U2 pipes_func {$$ = NULL;}|
+TK_IDENTIFICADOR '('')' TK_OC_U2 pipes_func {
+  ast_node_t *node = malloc(sizeof(ast_node_t));
+  node->type = AST_PIPE_R2;
+
+  ast_node_t *ident = malloc(sizeof(ast_node_t));
+  ident->type = AST_IDENTIFICADOR;
+  ident->value.data = $1;
+
+  comp_tree_t* ident_tree = tree_make_node((void*)ident);
+
+  $$ = tree_make_binary_node((void*)node,ident_tree,$5);
+}|
 TK_IDENTIFICADOR '(' func_params ')' TK_OC_U2 pipes_func {$$ = NULL;}
 ;
 
@@ -605,17 +633,43 @@ expression
 ;
 
 pipes_func:
-pipes_func TK_OC_U2 pipe_func |
-pipes_func TK_OC_U1 pipe_func |
-pipe_func
-;
+pipes_func TK_OC_U2 TK_IDENTIFICADOR '(' '.' pipes_exp ')' {
+  if($6 != NULL){
+    // tree_insert_node($$,$6);   
+  }
+}|
+pipes_func TK_OC_U1 TK_IDENTIFICADOR '(' '.' pipes_exp ')' {
+  ast_node_t *node = malloc(sizeof(ast_node_t));
+  node->type = AST_PIPE_R1;
 
-pipe_func:
-TK_IDENTIFICADOR '(' '.' pipes_exp ')'
+  ast_node_t *ident = malloc(sizeof(ast_node_t));
+  ident->type = AST_IDENTIFICADOR;
+  ident->value.data = $3;
+
+  comp_tree_t* ident_tree = tree_make_node((void*)ident);
+
+  $$ = tree_make_unary_node((void*)node,ident_tree);
+}|
+TK_IDENTIFICADOR '(' '.' pipes_exp ')' {
+    ast_node_t *ident = malloc(sizeof(ast_node_t));
+    ident->type = AST_IDENTIFICADOR;
+    ident->value.data = $1;
+
+    comp_tree_t* ident_tree = tree_make_node((void*)ident);
+    
+    if($4 == NULL){
+      $$ = ident_tree;   
+    } else {
+      tree_insert_node(ident_tree,$4);
+      $$ = ident_tree;                  
+    }
+}
 ;
 
 pipes_exp:
-',' expression pipes_exp |
+',' expression pipes_exp {
+    $$ = $2;
+}| {$$ = NULL;}
 ;
 
 shift:
