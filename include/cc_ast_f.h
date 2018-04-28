@@ -17,5 +17,6 @@
 #define __CC_AST_FUNCTIONS_H
 
 comp_tree_t* ast_make_binary_node(int type, comp_tree_t *node1, comp_tree_t *node2);
+comp_tree_t* ast_make_tree(int type, symbol *data);
 
 #endif

@@ -145,10 +145,7 @@ TK_LIT_STRING
 /* Regras de apoio - Fim */
 
 program: body {
-  ast_node_t* node = malloc(sizeof(ast_node_t));
-  node->type = AST_PROGRAMA;
-
-  tree = tree_make_node((void*)node);
+  tree = ast_make_tree(AST_PROGRAMA, NULL);
   $$ = tree;
 
   if ($1 != NULL){
@@ -212,22 +209,18 @@ vector:
 
 dec_func:
 TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' '{' simple_commands '}' {
-  ast_node_t *node = malloc(sizeof(ast_node_t));
-  node->type = AST_FUNCAO;
-  node->value.data = $3;
-  $$ = tree_make_node((void*)node);
-  if($8 != NULL){
-    tree_insert_node($$,$8);
-  }  
+  $$ = ast_make_tree(AST_FUNCAO, $3);
+  if ($8 != NULL)
+  {
+    tree_insert_node($$, $8);
+  }
 }|
 type TK_IDENTIFICADOR '(' list_params ')' '{' simple_commands '}' {
-  ast_node_t *node = malloc(sizeof(ast_node_t));
-  node->type = AST_FUNCAO;
-  node->value.data = $2;
-  $$ = tree_make_node((void*)node);
-  if($7 != NULL){
-    tree_insert_node($$,$7);
-  }  
+  $$ = ast_make_tree(AST_FUNCAO, $2);
+  if ($7 != NULL)
+  {
+    tree_insert_node($$, $7);
+  }
 }
 ;
 
@@ -243,9 +236,7 @@ TK_PR_CONST type TK_IDENTIFICADOR
 
 command_block:
 '{' simple_commands '}' {
-    ast_node_t *node = malloc(sizeof(ast_node_t));
-    node->type = AST_BLOCO;
-    $$ = tree_make_node((void*)node);
+    $$ = ast_make_tree(AST_BLOCO, NULL);
     if($2 != NULL) {
       tree_insert_node($$,$2);
     }
@@ -368,186 +359,79 @@ simple_commands control_flow ';' {
 
 declare_var_local:
 TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR init{
-    if($5 != NULL){
-      ast_node_t *node = malloc(sizeof(ast_node_t));
-      node->type = AST_DEC_INIT;
-      
-      ast_node_t *ident = malloc(sizeof(ast_node_t));
-      ident->type = AST_IDENTIFICADOR;
-      ident->value.data = $4;
-
-      comp_tree_t* ident_node = tree_make_node((void*)ident);
-      
-      $$ = tree_make_binary_node((void*)node, ident_node, $5);
+  if($5 != NULL){
+    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $4);
+    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $5);
   }
 }|
 TK_PR_STATIC type TK_IDENTIFICADOR init {
-  if($4 != NULL){
-    ast_node_t *node = malloc(sizeof(ast_node_t));
-    node->type = AST_DEC_INIT;
-    
-    ast_node_t *ident = malloc(sizeof(ast_node_t));
-    ident->type = AST_IDENTIFICADOR;
-    ident->value.data = $3;
-
-    comp_tree_t* ident_node = tree_make_node((void*)ident);
-    
-    $$ = tree_make_binary_node((void*)node, ident_node, $4);
+  if($4 != NULL){  
+    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3);
+    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
   }
 }|
 TK_PR_CONST type TK_IDENTIFICADOR init {
-    if($4 != NULL){
-      ast_node_t *node = malloc(sizeof(ast_node_t));
-      node->type = AST_DEC_INIT;
-      
-      ast_node_t *ident = malloc(sizeof(ast_node_t));
-      ident->type = AST_IDENTIFICADOR;
-      ident->value.data = $3;
-
-      comp_tree_t* ident_node = tree_make_node((void*)ident);
-      
-      $$ = tree_make_binary_node((void*)node, ident_node, $4);
+  if($4 != NULL){    
+    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3);
+    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
   }
 }|
 type TK_IDENTIFICADOR init {
   if($3 != NULL){
-    ast_node_t *node = malloc(sizeof(ast_node_t));
-    node->type = AST_DEC_INIT;
-    
-    ast_node_t *ident = malloc(sizeof(ast_node_t));
-    ident->type = AST_IDENTIFICADOR;
-    ident->value.data = $2;
-
-    comp_tree_t* ident_node = tree_make_node((void*)ident);
-    
-    $$ = tree_make_binary_node((void*)node, ident_node, $3);
-
+    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $2);
+    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $3);
   }
 }|
 TK_PR_STATIC TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-    if($5 != NULL){
-      ast_node_t *node = malloc(sizeof(ast_node_t));
-      node->type = AST_DEC_INIT;
-      
-      ast_node_t *ident = malloc(sizeof(ast_node_t));
-      ident->type = AST_IDENTIFICADOR;
-      ident->value.data = $4;
-
-      comp_tree_t* ident_node = tree_make_node((void*)ident);
-      
-      $$ = tree_make_binary_node((void*)node, ident_node, $5);
+  if($5 != NULL){
+    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $4);
+    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $5);
   }
 }|
 TK_PR_STATIC TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-    if($4 != NULL){
-      ast_node_t *node = malloc(sizeof(ast_node_t));
-      node->type = AST_DEC_INIT;
-      
-      ast_node_t *ident = malloc(sizeof(ast_node_t));
-      ident->type = AST_IDENTIFICADOR;
-      ident->value.data = $3;
-
-      comp_tree_t* ident_node = tree_make_node((void*)ident);
-      
-      $$ = tree_make_binary_node((void*)node, ident_node, $4);
+  if($4 != NULL){      
+    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3);
+    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
   }
 }|
 TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-    if($4 != NULL){
-      ast_node_t *node = malloc(sizeof(ast_node_t));
-      node->type = AST_DEC_INIT;
-      
-      ast_node_t *ident = malloc(sizeof(ast_node_t));
-      ident->type = AST_IDENTIFICADOR;
-      ident->value.data = $3;
-
-      comp_tree_t* ident_node = tree_make_node((void*)ident);
-      
-      $$ = tree_make_binary_node((void*)node, ident_node, $4);
+  if($4 != NULL){
+    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3); 
+    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
   }
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-    if($3 != NULL){
-      ast_node_t *node = malloc(sizeof(ast_node_t));
-      node->type = AST_DEC_INIT;
-      
-      ast_node_t *ident = malloc(sizeof(ast_node_t));
-      ident->type = AST_IDENTIFICADOR;
-      ident->value.data = $2;
-
-      comp_tree_t* ident_node = tree_make_node((void*)ident);
-      
-      $$ = tree_make_binary_node((void*)node, ident_node, $3);
+  if($3 != NULL){
+    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $2);
+    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $3);
   }
 }
 ;
 
 init:
-TK_OC_LE TK_IDENTIFICADOR {
-  ast_node_t *ident = malloc(sizeof(ast_node_t));
-  ident->type = AST_IDENTIFICADOR;
-  ident->value.data = $2;
-
-  $$ = tree_make_node((void*)ident);
-}|
-TK_OC_LE lit {
-  ast_node_t *lit = malloc(sizeof(ast_node_t));
-  lit->type = AST_LITERAL;
-  lit->value.data = $2;
-  
-  $$ = tree_make_node((void*)lit);
-}| 
+TK_OC_LE TK_IDENTIFICADOR { $$ = ast_make_tree(AST_IDENTIFICADOR, $2); }|
+TK_OC_LE lit { $$ = ast_make_tree(AST_LITERAL, $2); }|
 /* empty */ {$$ = NULL;}
 ;
 
 attribution:
 TK_IDENTIFICADOR '=' expression {
-  ast_node_t *ident = malloc(sizeof(ast_node_t));
-  ident->type = AST_IDENTIFICADOR;
-  ident->value.data = $1;
-  comp_tree_t* ident_node = tree_make_node((void*)ident);
+  comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $1);
 
-  ast_node_t *node = malloc(sizeof(ast_node_t));
-  node->type = AST_ATRIBUICAO;
-
-  $$ = tree_make_binary_node((void*)node, ident_node, $3);
+  $$ = ast_make_binary_node(AST_ATRIBUICAO, ident_node, $3);
 }|
 TK_IDENTIFICADOR '[' expression ']' '=' expression {
-  ast_node_t *vetor = malloc(sizeof(ast_node_t));
-  vetor->type = AST_VETOR_INDEXADO;
+  comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $1);
+  comp_tree_t* vetor_tree_node = ast_make_binary_node(AST_VETOR_INDEXADO, ident_node, $3);
 
-  ast_node_t *ident = malloc(sizeof(ast_node_t));
-  ident->type = AST_IDENTIFICADOR;
-  ident->value.data = $1;
-  comp_tree_t* ident_node = tree_make_node((void*)ident);
-
-  comp_tree_t* vetor_tree_node = tree_make_binary_node((void*)vetor, ident_node, $3);
-
-  ast_node_t *node = malloc(sizeof(ast_node_t));
-  node->type = AST_ATRIBUICAO;
-
-  $$ = tree_make_binary_node((void*)node, vetor_tree_node, $6);
+  $$ = ast_make_binary_node(AST_ATRIBUICAO, vetor_tree_node, $6);
 }|
 TK_IDENTIFICADOR '.' TK_IDENTIFICADOR '=' expression {
-  ast_node_t *vetor = malloc(sizeof(ast_node_t));
-  vetor->type = AST_TIPO_CAMPO;
+  comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $1);
+  comp_tree_t* ident_node_campo = ast_make_tree(AST_IDENTIFICADOR, $1);
 
-  ast_node_t *ident = malloc(sizeof(ast_node_t));
-  ident->type = AST_IDENTIFICADOR;
-  ident->value.data = $1;
-  comp_tree_t* ident_node = tree_make_node((void*)ident);
-
-  ast_node_t *ident_campo = malloc(sizeof(ast_node_t));
-  ident_campo->type = AST_IDENTIFICADOR;
-  ident_campo->value.data = $1;
-  comp_tree_t* ident_node_campo = tree_make_node((void*)ident_campo);
-
-  comp_tree_t* vetor_tree_node = tree_make_binary_node((void*)vetor, ident_node, ident_node_campo);
-
-  ast_node_t *node = malloc(sizeof(ast_node_t));
-  node->type = AST_ATRIBUICAO;
-
-  $$ = tree_make_binary_node((void*)node, vetor_tree_node, $5);
+  comp_tree_t* vetor_tree_node = ast_make_binary_node(AST_TIPO_CAMPO, ident_node, ident_node_campo);
+  $$ = ast_make_binary_node(AST_ATRIBUICAO, vetor_tree_node, $5);
 }
 ;
 

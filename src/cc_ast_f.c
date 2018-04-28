@@ -8,3 +8,15 @@ comp_tree_t* ast_make_binary_node(int type, comp_tree_t *node1, comp_tree_t *nod
 
   return tree_make_binary_node((void *) node, node1, node2);
 }
+
+comp_tree_t* ast_make_tree(int type, symbol *data)
+{
+  ast_node_t *node = malloc(sizeof(ast_node_t));
+  node->type = type;
+
+  if(data != NULL) {
+    node->value.data = data;
+  }
+
+  return tree_make_node((void *) node);
+}
