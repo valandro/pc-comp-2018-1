@@ -11,6 +11,7 @@
 #include "cc_list.h"
 #include "cc_misc.h"
 #include "cc_ast.h"
+#include "cc_ast_f.h"
 #include "cc_gv.h"
 #include "parser.h"
 
