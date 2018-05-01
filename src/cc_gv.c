@@ -116,7 +116,7 @@ void gv_init (const char *filename)
     fp = stderr;
   }
 //  intfp = fp;
-  fprintf (fp, "digraph G {\n");
+  fprintf (fp, "digraph G {\ngraph [ordering=\"out\"]\n");
   intfp = fopen(INTERNAL_OUTPUT, "w");
   // fprintf(intfp, "digraph G {\n");
 }

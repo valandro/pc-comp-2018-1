@@ -42,4 +42,4 @@ Para executar os testes individualmente, utilize "ctest -R e1_avaliacao_00 -V".
 
 * Documentação
 
-TODO
+Teste etapa 3: "make && cat ./file.txt | ./main; dot -Tpng e3.dot -ofilename.png"

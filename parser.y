@@ -428,7 +428,7 @@ TK_IDENTIFICADOR '[' expression ']' '=' expression {
 }|
 TK_IDENTIFICADOR '.' TK_IDENTIFICADOR '=' expression {
   comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $1);
-  comp_tree_t* ident_node_campo = ast_make_tree(AST_IDENTIFICADOR, $1);
+  comp_tree_t* ident_node_campo = ast_make_tree(AST_IDENTIFICADOR, $3);
 
   comp_tree_t* vetor_tree_node = ast_make_binary_node(AST_TIPO_CAMPO, ident_node, ident_node_campo);
   $$ = ast_make_binary_node(AST_ATRIBUICAO, vetor_tree_node, $5);
