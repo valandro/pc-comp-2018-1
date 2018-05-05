@@ -96,8 +96,8 @@ comp_tree_t* list_exp;
 %type <node> switch
 %type <node> init
 %type <node> declare_var_local
-%type <node> pipes_exp
-%type <node> pipes_func
+%type <node> fp
+%type <node> pipes
 
 %type <valor_lexico> lit
 %type <valor_lexico> TK_LIT_INT
@@ -452,16 +452,38 @@ TK_IDENTIFICADOR '(' func_params ')' {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
   $$ = ast_make_binary_node(AST_CHAMADA_DE_FUNCAO,ident_tree,$3);
 }|
-TK_IDENTIFICADOR '('')' TK_OC_U1 pipes_func {
+TK_IDENTIFICADOR '('')' TK_OC_U1 fp pipes {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
-  $$ = ast_make_binary_node(AST_PIPE_R1,ident_tree,$5);
+  comp_tree_t* pipe_tree = ast_make_unary_node(AST_PIPE_R1, $5);
+  if($6 != NULL){
+    tree_insert_node(pipe_tree,$6);
+  }
+  $$ = ast_make_binary_node(AST_CHAMADA_DE_FUNCAO,ident_tree,pipe_tree);
 }|
-TK_IDENTIFICADOR '(' func_params ')' TK_OC_U1 pipes_func {$$ = NULL;}|
-TK_IDENTIFICADOR '('')' TK_OC_U2 pipes_func {
+TK_IDENTIFICADOR '(' func_params ')' TK_OC_U1 fp pipes {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
-  $$ = ast_make_binary_node(AST_PIPE_R2,ident_tree,$5);
+  comp_tree_t* pipe_tree = ast_make_unary_node(AST_PIPE_R1, $6);
+  if($7 != NULL){
+    tree_insert_node(pipe_tree,$7);
+  }
+  $$ = ast_make_ternary_node(AST_CHAMADA_DE_FUNCAO,ident_tree,$3,pipe_tree);
 }|
-TK_IDENTIFICADOR '(' func_params ')' TK_OC_U2 pipes_func {$$ = NULL;}
+TK_IDENTIFICADOR '('')' TK_OC_U2 fp pipes {
+  comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
+  comp_tree_t* pipe_tree = ast_make_unary_node(AST_PIPE_R2, $5);
+  if($6 != NULL){
+    tree_insert_node(pipe_tree,$6);
+  }
+  $$ = ast_make_binary_node(AST_CHAMADA_DE_FUNCAO,ident_tree,pipe_tree);
+}|
+TK_IDENTIFICADOR '(' func_params ')' TK_OC_U2 fp pipes {
+  comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
+  comp_tree_t* pipe_tree = ast_make_unary_node(AST_PIPE_R2, $6);
+  if($7 != NULL){
+    tree_insert_node(pipe_tree,$7);
+  }
+  $$ = ast_make_ternary_node(AST_CHAMADA_DE_FUNCAO,ident_tree,$3,pipe_tree);
+}
 ;
 
 func_params:
@@ -472,34 +494,37 @@ expression ',' func_params {
 }|
 expression
 ;
-
-pipes_func:
-pipes_func TK_OC_U2 TK_IDENTIFICADOR '(' '.' pipes_exp ')' {
-  // TODO: Finalizar pipes.
-  if($6 != NULL){
-    // tree_insert_node($$,$6);   
-  }
-}|
-pipes_func TK_OC_U1 TK_IDENTIFICADOR '(' '.' pipes_exp ')' {
-  comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $3);
-  $$ = ast_make_unary_node(AST_PIPE_R1,ident_tree);
-}|
-TK_IDENTIFICADOR '(' '.' pipes_exp ')' {
+fp:
+TK_IDENTIFICADOR '(' '.' ')' {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
-  
-  if($4 == NULL){
-    $$ = ident_tree;   
-  } else {
-    tree_insert_node(ident_tree,$4);
-    $$ = ident_tree;                  
+  $$ = ident_tree;
+
+}| 
+TK_IDENTIFICADOR '(' '.' ',' list_exp ')' {
+  comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
+  $$ = ident_tree;
+
+  if($5 != NULL){
+    tree_insert_node(ident_tree,$5);
   }
 }
 ;
-
-pipes_exp:
-',' expression pipes_exp {
-  $$ = $2;
-}| {$$ = NULL;}
+pipes:
+TK_OC_U1 fp pipes {
+  comp_tree_t* pipe_r1 = ast_make_unary_node(AST_PIPE_R1,$2);
+  $$ = pipe_r1;
+  if($3 != NULL){
+    tree_insert_node(pipe_r1,$3);
+  }
+}|
+TK_OC_U2 fp pipes {
+  comp_tree_t* pipe_r2 = ast_make_unary_node(AST_PIPE_R2,$2);
+  $$ = pipe_r2;
+  if($3 != NULL){
+    tree_insert_node(pipe_r2,$3);
+  }
+}|
+/* empty */ {$$ = NULL;}
 ;
 
 shift:
