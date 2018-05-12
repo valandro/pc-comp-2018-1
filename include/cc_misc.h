@@ -16,6 +16,7 @@ union tValue {
 typedef struct {
   size_t line;
   size_t type;
+  
   union tValue value;
 } symbol;
 
@@ -27,11 +28,11 @@ typedef struct {
 
 typedef struct ast_node
 {
-    int type;
-    union
-    {
-      symbol* data;
-    } value;
+  int type;
+  union
+  {
+    symbol* data;
+  } value;
 } ast_node_t;
 
 #include "parser.h"

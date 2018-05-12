@@ -545,7 +545,7 @@ TK_IDENTIFICADOR TK_OC_SR TK_LIT_INT {
 list_exp:
 expression ',' list_exp {
   if($3 != NULL){
-   tree_insert_node($$,$3);   
+    tree_insert_node($$,$3);   
   }
 }|
 expression

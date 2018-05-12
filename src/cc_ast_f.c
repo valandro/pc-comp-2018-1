@@ -29,7 +29,6 @@ comp_tree_t* ast_make_unary_node(int type, comp_tree_t* node)
   return tree_make_unary_node((void *) nodeValue, node);
 }
 
-
 comp_tree_t* ast_make_ternary_node(int type, comp_tree_t *node1, comp_tree_t *node2, comp_tree_t *node3) {
   ast_node_t *nodeValue = malloc(sizeof(ast_node_t));
   nodeValue->type = type;
