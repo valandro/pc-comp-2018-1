@@ -6,8 +6,7 @@
 #include "cc_tree.h"
 comp_tree_t* tree;
 comp_tree_t* last_function;
-comp_tree_t* list_exp;
-
+extern comp_dict_t* symbol_table;
 }
 // Inicializando contador que identifica a primeira função
 %{
@@ -107,12 +106,14 @@ comp_tree_t* list_exp;
 %type <valor_lexico> TK_LIT_CHAR
 %type <valor_lexico> TK_LIT_STRING
 %type <valor_lexico> TK_IDENTIFICADOR
+%type <type> type
 
 
 %union
 {
   symbol* valor_lexico;
   comp_tree_t* node;
+  int type;
 }
 
 %start program
@@ -120,11 +121,11 @@ comp_tree_t* list_exp;
 /* Regras (e ações) da gramática */
 /* Regras de apoio - Começo */
 type:
-TK_PR_INT |
-TK_PR_FLOAT |
-TK_PR_CHAR |
-TK_PR_BOOL |
-TK_PR_STRING
+TK_PR_INT    {$$ = IKS_INT;}  |
+TK_PR_FLOAT  {$$ = IKS_FLOAT;}|
+TK_PR_CHAR   {$$ = IKS_CHAR;} |
+TK_PR_BOOL   {$$ = IKS_BOOL;} |
+TK_PR_STRING {$$ = IKS_STRING;}
 ;
 
 encap:
@@ -255,13 +256,13 @@ simple_commands command_block ';' {
   }
 }|
 simple_commands declare_var_local ';' {
-  if($$ == NULL){
+  if($$ == NULL && $2 != NULL){
    $$ = $2;
    $$->last = $2;
   }
-  else {
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
+  else if($2 != NULL){
+    tree_insert_node($$->last,$2);
+    $$->last = $2;
   }
 }|
 simple_commands attribution ';' {
@@ -270,8 +271,8 @@ simple_commands attribution ';' {
    $$->last = $2;
   }
   else {
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
+    tree_insert_node($$->last,$2);
+    $$->last = $2;
   }
 }|
 simple_commands input ';' {
@@ -359,52 +360,28 @@ simple_commands control_flow ';' {
 
 declare_var_local:
 TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR init{
-  if($5 != NULL){
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $4);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $5);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
 }|
 TK_PR_STATIC type TK_IDENTIFICADOR init {
-  if($4 != NULL){  
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);  
 }|
 TK_PR_CONST type TK_IDENTIFICADOR init {
-  if($4 != NULL){    
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
 }|
 type TK_IDENTIFICADOR init {
-  if($3 != NULL){
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $2);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $3);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$2,$3);
 }|
 TK_PR_STATIC TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  if($5 != NULL){
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $4);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $5);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
 }|
 TK_PR_STATIC TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  if($4 != NULL){      
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
 }|
 TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  if($4 != NULL){
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3); 
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  if($3 != NULL){
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $2);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $3);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$2,$3);
 }
 ;
 
