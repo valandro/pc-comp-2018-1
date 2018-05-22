@@ -69,6 +69,7 @@ symbol* insert_symbol_table(int token, int type) {
     // Lexema não encontrado, inserindo elemento no array de dados
     symbol element;
     element.line = yylineno;
+    element.iks_type = IKS_NOT_SET_VALUE; // O tipo da variavél ainda não foi setado.
 
     switch (token) {
       case TK_LIT_INT:

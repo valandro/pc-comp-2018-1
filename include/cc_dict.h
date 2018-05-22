@@ -112,4 +112,7 @@ void *dict_remove(comp_dict_t * dict, char *key);
  */
 void dict_debug_print(comp_dict_t * dict);
 
+/* Função que concatena a entrada da tabela de simbolos */
+char* dict_concat_key(char* key, size_t type);
+
 #endif                          //CC_DICT_H_

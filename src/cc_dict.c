@@ -245,3 +245,13 @@ void *dict_remove(comp_dict_t * dict, char *key)
 
   return data;
 }
+char* dict_concat_key(char* key, size_t type){
+  int int_value = type;
+  char c[10];
+  sprintf(c, "%d", int_value);
+  // Combinando valor da lexema com tipo do token, com $ como separador
+  strcat(key, "$");
+  strcat(key, c);
+
+  return key;
+}

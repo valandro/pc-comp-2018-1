@@ -192,20 +192,60 @@ field:
 encap type TK_IDENTIFICADOR ;
 
 dec_var_global:
-declare vector |
-TK_PR_STATIC declare vector |
-TK_PR_CLASS declare vector |
-TK_PR_STATIC TK_PR_CLASS declare vector
+declare |
+TK_PR_STATIC declare |
+TK_PR_CLASS declare |
+TK_PR_STATIC TK_PR_CLASS declare
 
 ;
 
 declare:
-type TK_IDENTIFICADOR |
-TK_IDENTIFICADOR TK_IDENTIFICADOR
-;
-
-vector:
-'[' TK_LIT_INT ']' |
+type TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
+  char* entry = dict_concat_key($2->value.s,$2->type);
+  symbol* value = dict_get(symbol_table,entry);
+  if(value != NULL){
+    if(value->iks_type == IKS_NOT_SET_VALUE){
+      value->iks_type = $1;
+      value->vector_size = $4->value.i;
+    } else {
+      exit(IKS_ERROR_DECLARED);
+    }
+  }
+}|
+type TK_IDENTIFICADOR {
+  char* entry = dict_concat_key($2->value.s,$2->type);
+  symbol* value = dict_get(symbol_table,entry);
+  if(value != NULL){
+    if(value->iks_type == IKS_NOT_SET_VALUE){
+      value->iks_type = $1;
+    } else {
+      exit(IKS_ERROR_DECLARED);
+    }
+  }  
+}|
+TK_IDENTIFICADOR TK_IDENTIFICADOR {
+  char* entry = dict_concat_key($2->value.s,$2->type);
+  symbol* value = dict_get(symbol_table,entry);
+  if(value != NULL){
+    if(value->iks_type == IKS_NOT_SET_VALUE){
+      value->iks_type = IKS_USER_TYPE;
+    } else {
+      exit(IKS_ERROR_DECLARED);
+    }
+  }  
+}|
+TK_IDENTIFICADOR TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
+  char* entry = dict_concat_key($2->value.s,$2->type);
+  symbol* value = dict_get(symbol_table,entry);
+  if(value != NULL){
+    if(value->iks_type == IKS_NOT_SET_VALUE){
+      value->iks_type = IKS_USER_TYPE;
+      value->vector_size = $4->value.i;
+    } else {
+      exit(IKS_ERROR_DECLARED);
+    }
+  }
+}
 ;
 
 dec_func:
