@@ -70,6 +70,7 @@ symbol* insert_symbol_table(int token, int type) {
     symbol element;
     element.line = yylineno;
     element.iks_type = IKS_NOT_SET_VALUE; // O tipo da variavél ainda não foi setado.
+    element.vector_size = IKS_NON_VECTOR ;
 
     switch (token) {
       case TK_LIT_INT:
@@ -180,4 +181,18 @@ void comp_print_table (void)
       }
     }
   }
+}
+void declare_var(comp_dict_t* table, symbol* ident, int type, int vector_size){
+  char* entry = dict_concat_key(ident->value.s,ident->type);
+  symbol* value = dict_get(table,entry);
+  if(value != NULL){
+    if(value->iks_type == IKS_NOT_SET_VALUE){
+      value->iks_type = type;
+      value->vector_size = vector_size;
+    } else {
+      exit(IKS_ERROR_DECLARED);
+    }
+  }
+  printf("%d\n",value->iks_type);
+  printf("%d\n",value->vector_size);  
 }

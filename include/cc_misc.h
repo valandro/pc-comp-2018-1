@@ -44,4 +44,5 @@ void yyerror (char const *mensagem);
 void main_init (int argc, char **argv);
 void main_finalize (void);
 symbol* insert_symbol_table(int token, int type);
+void declare_var(comp_dict_t* table, symbol* ident, int type, int vector_size);
 #endif

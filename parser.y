@@ -7,6 +7,7 @@
 comp_tree_t* tree;
 comp_tree_t* last_function;
 extern comp_dict_t* symbol_table;
+comp_dict_t* local_symbol_table;
 }
 // Inicializando contador que identifica a primeira função
 %{
@@ -201,50 +202,16 @@ TK_PR_STATIC TK_PR_CLASS declare
 
 declare:
 type TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
-  char* entry = dict_concat_key($2->value.s,$2->type);
-  symbol* value = dict_get(symbol_table,entry);
-  if(value != NULL){
-    if(value->iks_type == IKS_NOT_SET_VALUE){
-      value->iks_type = $1;
-      value->vector_size = $4->value.i;
-    } else {
-      exit(IKS_ERROR_DECLARED);
-    }
-  }
+  declare_var(symbol_table,$2,$1,$4->value.i);
 }|
 type TK_IDENTIFICADOR {
-  char* entry = dict_concat_key($2->value.s,$2->type);
-  symbol* value = dict_get(symbol_table,entry);
-  if(value != NULL){
-    if(value->iks_type == IKS_NOT_SET_VALUE){
-      value->iks_type = $1;
-    } else {
-      exit(IKS_ERROR_DECLARED);
-    }
-  }  
+  declare_var(symbol_table,$2,$1,IKS_NON_VECTOR);
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR {
-  char* entry = dict_concat_key($2->value.s,$2->type);
-  symbol* value = dict_get(symbol_table,entry);
-  if(value != NULL){
-    if(value->iks_type == IKS_NOT_SET_VALUE){
-      value->iks_type = IKS_USER_TYPE;
-    } else {
-      exit(IKS_ERROR_DECLARED);
-    }
-  }  
+  declare_var(symbol_table,$2,IKS_USER_TYPE,IKS_NON_VECTOR);   
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
-  char* entry = dict_concat_key($2->value.s,$2->type);
-  symbol* value = dict_get(symbol_table,entry);
-  if(value != NULL){
-    if(value->iks_type == IKS_NOT_SET_VALUE){
-      value->iks_type = IKS_USER_TYPE;
-      value->vector_size = $4->value.i;
-    } else {
-      exit(IKS_ERROR_DECLARED);
-    }
-  }
+  declare_var(symbol_table,$2,IKS_USER_TYPE,$4->value.i);   
 }
 ;
 
@@ -401,6 +368,7 @@ simple_commands control_flow ';' {
 declare_var_local:
 TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR init{
   $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
+
 }|
 TK_PR_STATIC type TK_IDENTIFICADOR init {
   $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);  

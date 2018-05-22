@@ -17,7 +17,10 @@
 #define IKS_ERROR_EXCESS_ARGS 10     //sobram argumentos
 #define IKS_ERROR_WRONG_TYPE_ARGS 11 //argumentos incompatíveis
 
+
+/* ETAPA 4 */
 #define IKS_NOT_SET_VALUE -1        // iks ainda não foi salvo na tabela
+#define IKS_NON_VECTOR  0           // Valor para ver se a variavel é um vetor
 
 #define IKS_UNDECLARED -1
 #define IKS_INT        1
