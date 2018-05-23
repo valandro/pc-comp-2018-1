@@ -39,6 +39,8 @@
 %token TK_OC_OR
 %token TK_OC_SL
 %token TK_OC_SR
+%token TK_OC_FORWARD_PIPE
+%token TK_OC_BASH_PIPE
 %token TK_LIT_INT
 %token TK_LIT_FLOAT
 %token TK_LIT_FALSE
