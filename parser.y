@@ -203,19 +203,15 @@ TK_PR_STATIC TK_PR_CLASS declare
 
 declare:
 type TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
-  
   declare_var(symbol_table,$2,$1,$4->value.i);
 }|
 type TK_IDENTIFICADOR {
-  
   declare_var(symbol_table,$2,$1,IKS_NON_VECTOR);
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR {
-  
   declare_var(symbol_table,$2,IKS_USER_TYPE,IKS_NON_VECTOR);   
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
-  
   declare_var(symbol_table,$2,IKS_USER_TYPE,$4->value.i);   
 }
 ;
@@ -424,7 +420,6 @@ TK_OC_LE lit { $$ = ast_make_tree(AST_LITERAL, $2); }|
 attribution:
 TK_IDENTIFICADOR '=' expression {
   comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $1);
-
   $$ = ast_make_binary_node(AST_ATRIBUICAO, ident_node, $3);
 }|
 TK_IDENTIFICADOR '[' expression ']' '=' expression {
@@ -669,10 +664,14 @@ expression TK_OC_SR expression { $$ = ast_make_binary_node(AST_SHIFT_RIGHT, $1, 
 TK_LIT_INT { $$ = ast_make_tree(AST_LITERAL, $1); }|
 TK_LIT_FLOAT { $$ = ast_make_tree(AST_LITERAL, $1); }|
 func_call { $$ = $1; }|
-TK_IDENTIFICADOR { $$ = ast_make_tree(AST_IDENTIFICADOR, $1); }|
+TK_IDENTIFICADOR {
+  $$ = ast_make_tree(AST_IDENTIFICADOR, $1); 
+  ident_verify(symbol_table,$1,LOCAL_SCOPE,IKS_NON_VECTOR);
+}|
 TK_IDENTIFICADOR '['expression']' {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
   $$ = ast_make_binary_node(AST_VETOR_INDEXADO, ident_tree, $3);
+  ident_verify(symbol_table,$1,LOCAL_SCOPE,IKS_VECTOR);  
 }
 ;
 %%

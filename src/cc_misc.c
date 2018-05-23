@@ -233,14 +233,30 @@ void declare_var(comp_dict_t* table, symbol* ident, int type, int vector_size){
   char* entry = dict_concat_key(ident->value.s,ident->type);
   symbol* value = dict_get(table,entry);
   if(value != NULL){
-    printf("scope dec: %d\n",scope);
     if(value->iks_type[scope] == IKS_NOT_SET_VALUE){
       value->iks_type[scope] = type;
       value->vector_size = vector_size;
     } else {
-      printf("declared: %d\n", scope);
       exit(IKS_ERROR_DECLARED);
     }
   }
   printf("iks: %d %d\n",value->iks_type[0],value->iks_type[1]);
+}
+void ident_verify(comp_dict_t* table, symbol* ident, int scope, bool vector){
+  char* entry = dict_concat_key(ident->value.s,ident->type);
+  symbol* value = dict_get(table,entry);
+  printf("scope %d\n",scope);
+  if(value != NULL){
+    // Procurando o identificador nos Escopos Globais e Local
+    if(value->iks_type[scope] == IKS_NOT_SET_VALUE){
+      if(value->iks_type[scope-1] == IKS_NOT_SET_VALUE){
+        exit(IKS_ERROR_UNDECLARED);
+      }
+    }
+    if(value->vector_size > 0 && !vector){
+      exit(IKS_ERROR_VECTOR);
+    } else if(value->vector_size == 0 && vector){
+      exit(IKS_ERROR_VARIABLE);
+    }
+  }
 }

@@ -20,14 +20,17 @@
 
 /* ETAPA 4 */
 #define IKS_NOT_SET_VALUE -1        // iks ainda não foi salvo na tabela
-#define IKS_NON_VECTOR  0           // Valor para ver se a variavel é um vetor
+#define IKS_NON_VECTOR     0        // Valor para ver se a variavel é um vetor
+#define IKS_VECTOR         1
 
 #define IKS_UNDECLARED -1
-#define IKS_INT        1
-#define IKS_FLOAT      2
-#define IKS_CHAR       3
-#define IKS_STRING     4
-#define IKS_BOOL       5
-#define IKS_USER_TYPE  6
+#define IKS_INT         1
+#define IKS_FLOAT       2
+#define IKS_CHAR        3
+#define IKS_STRING      4
+#define IKS_BOOL        5
+#define IKS_USER_TYPE   6
 
+#define GLOBAL_SCOPE    0
+#define LOCAL_SCOPE     1
 #endif
