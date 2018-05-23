@@ -2,8 +2,11 @@
 
 extern int yylineno;
 extern char *yytext;
+int scope;
 
 comp_dict_t *symbol_table;
+comp_dict_t *local_symbol_table;
+
 symbolArray symbol_data;
 
 void initArray(symbolArray *a) {
@@ -62,14 +65,56 @@ symbol* insert_symbol_table(int token, int type) {
   // Se encontrado, atualiza o valor da última linha encontra.
   // Se não, insere na tabela.
   symbol* foundEntry = dict_get(symbol_table, entry);
-  if(foundEntry) {
+  
+  if(foundEntry != NULL) {
     // Atualizar valor para valor da última linha onde lexema é encontrado
-    (*foundEntry).line = yylineno;
+    // Atualizando o valor salvo, pois havia um erro de dup no element.value
+    symbol element;
+    element.line = yylineno;
+    
+    switch (token) {
+      case TK_LIT_INT:
+        element.type = POA_LIT_INT;
+        element.value.i = atoi(lexeme);
+        break;
+      case TK_LIT_FLOAT:
+        element.type = POA_LIT_FLOAT;
+        element.value.f = atof(lexeme);
+        break;
+      case TK_LIT_CHAR:
+        element.type = POA_LIT_CHAR;
+        element.value.c = (char) lexeme[0];
+        break;
+      case TK_LIT_TRUE:
+        element.type = POA_LIT_BOOL;
+        element.value.b = true;
+        break;
+      case TK_LIT_FALSE:
+        element.type = POA_LIT_BOOL;
+        element.value.b = false;
+        break;
+      case TK_LIT_STRING:
+        element.type = POA_LIT_STRING;
+        element.value.s = strdup(lexeme);
+        break;
+      case TK_IDENTIFICADOR:
+        element.type = POA_IDENT;
+        element.value.s = strdup(lexeme);
+        break;
+      default:
+        // No default behavior defined.
+        break;
+    }
+    
+    i = insertArray(&symbol_data, element);
+    foundEntry = &symbol_data.array[i];
+    dict_put(symbol_table, entry, foundEntry);
   } else {
     // Lexema não encontrado, inserindo elemento no array de dados
     symbol element;
     element.line = yylineno;
-    element.iks_type = IKS_NOT_SET_VALUE; // O tipo da variavél ainda não foi setado.
+    element.iks_type[0] = IKS_NOT_SET_VALUE; // O tipo da variavél ainda não foi setado. Escopo Global
+    element.iks_type[1] = IKS_NOT_SET_VALUE; // O tipo da variavél ainda não foi setado. Escopo Local    
     element.vector_size = IKS_NON_VECTOR ;
 
     switch (token) {
@@ -105,11 +150,12 @@ symbol* insert_symbol_table(int token, int type) {
         // No default behavior defined.
         break;
     }
-  
+    
     i = insertArray(&symbol_data, element);
     foundEntry = &symbol_data.array[i];
     dict_put(symbol_table, entry, foundEntry);
   }
+  
   free(lexeme);
   free(entry);
 
@@ -126,6 +172,7 @@ void main_init (int argc, char **argv)
 {
   // Rotinas de inicialização do programa
   symbol_table = dict_new();
+  local_symbol_table = dict_new();
   initArray(&symbol_data);
 }
 
@@ -186,13 +233,14 @@ void declare_var(comp_dict_t* table, symbol* ident, int type, int vector_size){
   char* entry = dict_concat_key(ident->value.s,ident->type);
   symbol* value = dict_get(table,entry);
   if(value != NULL){
-    if(value->iks_type == IKS_NOT_SET_VALUE){
-      value->iks_type = type;
+    printf("scope dec: %d\n",scope);
+    if(value->iks_type[scope] == IKS_NOT_SET_VALUE){
+      value->iks_type[scope] = type;
       value->vector_size = vector_size;
     } else {
+      printf("declared: %d\n", scope);
       exit(IKS_ERROR_DECLARED);
     }
   }
-  printf("%d\n",value->iks_type);
-  printf("%d\n",value->vector_size);  
+  printf("iks: %d %d\n",value->iks_type[0],value->iks_type[1]);
 }

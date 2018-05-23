@@ -7,12 +7,13 @@
 comp_tree_t* tree;
 comp_tree_t* last_function;
 extern comp_dict_t* symbol_table;
-comp_dict_t* local_symbol_table;
+extern int scope;
 }
 // Inicializando contador que identifica a primeira função
 %{
   int count = 0;
-  int pcount = 0;  
+  int pcount = 0;
+  int scope = 0;
 %}
 /* Declaração dos tokens da linguagem */
 /* Palavras Reservadas */
@@ -202,33 +203,39 @@ TK_PR_STATIC TK_PR_CLASS declare
 
 declare:
 type TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
+  
   declare_var(symbol_table,$2,$1,$4->value.i);
 }|
 type TK_IDENTIFICADOR {
+  
   declare_var(symbol_table,$2,$1,IKS_NON_VECTOR);
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR {
+  
   declare_var(symbol_table,$2,IKS_USER_TYPE,IKS_NON_VECTOR);   
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
+  
   declare_var(symbol_table,$2,IKS_USER_TYPE,$4->value.i);   
 }
 ;
 
 dec_func:
-TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' '{' simple_commands '}' {
+TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' command_block {
   $$ = ast_make_tree(AST_FUNCAO, $3);
-  if ($8 != NULL)
-  {
-    tree_insert_node($$, $8);
-  }
-}|
-type TK_IDENTIFICADOR '(' list_params ')' '{' simple_commands '}' {
-  $$ = ast_make_tree(AST_FUNCAO, $2);
   if ($7 != NULL)
   {
     tree_insert_node($$, $7);
   }
+  scope = 0; // Voltando para o scope global
+}|
+type TK_IDENTIFICADOR '(' list_params ')' command_block {
+  $$ = ast_make_tree(AST_FUNCAO, $2);
+  if ($6 != NULL)
+  {
+    tree_insert_node($$, $6);
+  }
+  scope = 0; // Voltando para o scope global
 }
 ;
 
@@ -367,29 +374,44 @@ simple_commands control_flow ';' {
 
 declare_var_local:
 TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR init{
+  scope = 1; // Entrando no escopo local  
   $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
-
+  declare_var(symbol_table,$4,$3,IKS_NON_VECTOR);  
 }|
 TK_PR_STATIC type TK_IDENTIFICADOR init {
-  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);  
+  scope = 1; // Entrando no escopo local  
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
+  declare_var(symbol_table,$3,$2,IKS_NON_VECTOR);      
 }|
 TK_PR_CONST type TK_IDENTIFICADOR init {
+  scope = 1; // Entrando no escopo local  
   $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
+  declare_var(symbol_table,$3,$2,IKS_NON_VECTOR);        
 }|
 type TK_IDENTIFICADOR init {
+  scope = 1; // Entrando no escopo local
   $$ = ast_dec_init(AST_IDENTIFICADOR,$2,$3);
+  declare_var(symbol_table,$2,$1,IKS_NON_VECTOR);  
 }|
 TK_PR_STATIC TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init {
+  scope = 1; // Entrando no escopo local  
   $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
+  declare_var(symbol_table,$4,IKS_USER_TYPE,IKS_NON_VECTOR);    
 }|
 TK_PR_STATIC TK_IDENTIFICADOR TK_IDENTIFICADOR init {
+  scope = 1; // Entrando no escopo local  
   $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
+  declare_var(symbol_table,$3,IKS_USER_TYPE,IKS_NON_VECTOR);      
 }|
 TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init {
+  scope = 1; // Entrando no escopo local  
   $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
+  declare_var(symbol_table,$3,IKS_USER_TYPE,IKS_NON_VECTOR);        
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR init {
+  scope = 1; // Entrando no escopo local  
   $$ = ast_dec_init(AST_IDENTIFICADOR,$2,$3);
+  declare_var(symbol_table,$2,IKS_USER_TYPE,IKS_NON_VECTOR);        
 }
 ;
 

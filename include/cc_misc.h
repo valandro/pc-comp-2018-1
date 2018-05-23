@@ -16,7 +16,7 @@ union tValue {
 typedef struct {
   size_t line;
   size_t type;
-  size_t iks_type;
+  size_t iks_type[2];
   size_t vector_size;
   union tValue value;
 } symbol;
