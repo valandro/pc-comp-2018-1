@@ -2,10 +2,8 @@
 
 extern int yylineno;
 extern char *yytext;
-int scope;
 
 comp_dict_t *symbol_table;
-comp_dict_t *local_symbol_table;
 
 symbolArray symbol_data;
 
@@ -48,15 +46,18 @@ symbol* insert_symbol_table(int token, int type) {
   char *lexeme = strdup(yytext);
   char *entry = strdup(yytext);
   size_t i;
+
   // Caso char ou string, remover aspas da string.
   if(token == TK_LIT_CHAR || token == TK_LIT_STRING) {
     memmove(lexeme, lexeme + 1, strlen(lexeme)); //Remove o primeiro caracter ' ou "
     lexeme[strlen(lexeme) - 1] = '\0'; //Remove o último caracter ' ou "
   }
+
   // Cast do tipo do token de int para char.
   int int_value = type;
   char c[10];
   sprintf(c, "%d", int_value);
+
   // Combinando valor da lexema com tipo do token, com $ como separador
   strcat(entry, "$");
   strcat(entry, c);
@@ -172,7 +173,6 @@ void main_init (int argc, char **argv)
 {
   // Rotinas de inicialização do programa
   symbol_table = dict_new();
-  local_symbol_table = dict_new();
   initArray(&symbol_data);
 }
 
@@ -229,9 +229,10 @@ void comp_print_table (void)
     }
   }
 }
-void declare_var(comp_dict_t* table, symbol* ident, int type, int vector_size){
+void declare_var(symbol* ident, int type, int vector_size, int scope) {
   char* entry = dict_concat_key(ident->value.s,ident->type);
-  symbol* value = dict_get(table,entry);
+  symbol* value = dict_get(symbol_table,entry);
+
   if(value != NULL){
     if(value->iks_type[scope] == IKS_NOT_SET_VALUE){
       value->iks_type[scope] = type;
@@ -240,12 +241,13 @@ void declare_var(comp_dict_t* table, symbol* ident, int type, int vector_size){
       exit(IKS_ERROR_DECLARED);
     }
   }
-  printf("iks: %d %d\n",value->iks_type[0],value->iks_type[1]);
+  // printf("iks: %d %d\n",value->iks_type[0],value->iks_type[1]);
 }
-void ident_verify(comp_dict_t* table, symbol* ident, int scope, bool vector){
+
+void ident_verify(symbol* ident, int scope, bool isVector) {
   char* entry = dict_concat_key(ident->value.s,ident->type);
-  symbol* value = dict_get(table,entry);
-  printf("scope %d\n",scope);
+  symbol* value = dict_get(symbol_table,entry);
+
   if(value != NULL){
     // Procurando o identificador nos Escopos Globais e Local
     if(value->iks_type[scope] == IKS_NOT_SET_VALUE){
@@ -253,9 +255,12 @@ void ident_verify(comp_dict_t* table, symbol* ident, int scope, bool vector){
         exit(IKS_ERROR_UNDECLARED);
       }
     }
-    if(value->vector_size > 0 && !vector){
+
+    if(value->vector_size > 0 && !isVector) {
+      // Teste sobre tentativa de usar variável como vetor
       exit(IKS_ERROR_VECTOR);
-    } else if(value->vector_size == 0 && vector){
+    } else if(value->vector_size == 0 && isVector) {
+      // Vetor de tamanho zero
       exit(IKS_ERROR_VARIABLE);
     }
   }
