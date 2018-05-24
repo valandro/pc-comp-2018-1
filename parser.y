@@ -107,13 +107,17 @@ extern comp_dict_t* symbol_table;
 %type <valor_lexico> TK_LIT_STRING
 %type <valor_lexico> TK_IDENTIFICADOR
 %type <type> type
+%type <type> param
 
+%type <param_list> list_params
+%type <param_list> list_fields
 
 %union
 {
   symbol* valor_lexico;
   comp_tree_t* node;
   int type;
+  ParamList* param_list;
 }
 
 %start program
@@ -180,16 +184,22 @@ body dec_func {
 ;
 
 dec_var_new_type:
-TK_PR_CLASS TK_IDENTIFICADOR '[' list_fields ']'
+TK_PR_CLASS TK_IDENTIFICADOR '[' list_fields ']' {
+  declare_class($2, $4);
+}
 ;
 
 list_fields:
-list_fields ':' field |
-field
+encap type TK_IDENTIFICADOR ':' list_fields {
+  // Adiciona argumentos na lista.
+  $$ = ParamList_addParam($5, $2, $3->value.s);
+} |
+encap type TK_IDENTIFICADOR  {
+  // Último parâmetro da lista, inicia lista de argumentos.
+  ParamList* param_list = ParamList_init($2, $3->value.s);
+  $$ = param_list;
+}
 ;
-
-field:
-encap type TK_IDENTIFICADOR ;
 
 dec_var_global:
 declare |
@@ -232,13 +242,26 @@ type TK_IDENTIFICADOR '(' list_params ')' command_block {
 ;
 
 list_params:
-param ',' list_params |
-param |
+param ',' list_params {
+  // Adiciona argumentos na lista.
+  $$ = ParamList_addParam($3, $1, NULL);
+}|
+param {
+  // Último parâmetro da lista, inicia lista de argumentos.
+  ParamList* param_list = ParamList_init($1, NULL);
+  $$ = param_list;
+}| {
+  $$ = NULL;
+}
 ;
 
 param:
-type TK_IDENTIFICADOR |
-TK_PR_CONST type TK_IDENTIFICADOR
+type TK_IDENTIFICADOR {
+  $$ = $1;
+}|
+TK_PR_CONST type TK_IDENTIFICADOR {
+  $$ = $2; 
+}
 ;
 
 command_block:

@@ -230,8 +230,8 @@ void comp_print_table (void)
   }
 }
 void declare_var(symbol* ident, int type, int vector_size, int scope) {
-  char* entry = dict_concat_key(ident->value.s,ident->type);
-  symbol* value = dict_get(symbol_table,entry);
+  char* entry = dict_concat_key(ident->value.s, ident->type);
+  symbol* value = dict_get(symbol_table, entry);
 
   if(value != NULL){
     if(value->iks_type[scope] == IKS_NOT_SET_VALUE){
@@ -242,6 +242,18 @@ void declare_var(symbol* ident, int type, int vector_size, int scope) {
     }
   }
   // printf("iks: %d %d\n",value->iks_type[0],value->iks_type[1]);
+}
+
+void declare_class(symbol* ident, ParamList* field_list) {
+  char* entry = dict_concat_key(ident->value.s, ident->type);
+  symbol* value = dict_get(symbol_table, entry);
+
+  if(value != NULL){
+    value->iks_type[GLOBAL_SCOPE] = IKS_USER_TYPE;
+    value->vector_size = IKS_NON_VECTOR;
+
+    value->field_list = field_list; 
+  }
 }
 
 void ident_verify(symbol* ident, int scope, bool isVector) {
