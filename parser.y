@@ -443,6 +443,26 @@ TK_IDENTIFICADOR '.' TK_IDENTIFICADOR '=' expression {
   comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $1);
   comp_tree_t* ident_node_campo = ast_make_tree(AST_IDENTIFICADOR, $3);
 
+  char* key = dict_concat_key($1->value.s, $1->type);
+  symbol* value = dict_get(symbol_table, key);
+
+  int achou = 0;
+  ParamList* previous = NULL;
+  ParamList* current = value->field_list;
+  do {
+    if(strcmp(current->identificador, $3->value.s) == 0) {
+      achou = 1;
+    } else {
+      previous = current;
+      current = current->next;
+    }
+  } while(previous->next != NULL && achou == 0);
+
+  if(achou == 0) {
+    // Campo da classe inválido.
+    exit(IKS_ERROR_CLASS_INVALID_FIELD);
+  }
+
   comp_tree_t* vetor_tree_node = ast_make_binary_node(AST_TIPO_CAMPO, ident_node, ident_node_campo);
   $$ = ast_make_binary_node(AST_ATRIBUICAO, vetor_tree_node, $5);
 }
@@ -501,12 +521,44 @@ TK_IDENTIFICADOR '(' func_params ')' TK_OC_U2 fp pipes {
 
 func_params:
 expression ',' func_params {
-  if($3 != NULL){
-    tree_insert_node($$,$3);   
-  }
+  // TODO: fix árvore de paramêtros da função
+  // if($3 != NULL){
+  //   tree_insert_node($$,$3);   
+  // }
+
+  // Adiciona argumentos na lista.
+  // $$ = ParamList_addParam($3, $1, NULL);
 }|
-expression
+expression {
+  ast_node_t* node_ast = (ast_node_t*) $1->value;
+  symbol* data = node_ast->value.data;
+
+  char key[1000]; // Magic number
+  switch(data->type) {
+    case POA_LIT_INT:  
+      sprintf(key, "%d$%d", data->value.i, (int)data->type);
+      break;
+    case POA_LIT_FLOAT:
+      sprintf(key, "%f$%d", data->value.f, (int)data->type);
+      break;
+    case POA_LIT_CHAR:
+      sprintf(key, "%c$%d", data->value.c, (int)data->type);
+      break;
+    case POA_LIT_STRING:
+      sprintf(key, "%s$%d", data->value.s, (int)data->type);
+      break;
+    case POA_IDENT:
+      sprintf(key, "%s$%d", data->value.s, (int)data->type);
+      break;
+  }
+
+  symbol* value = dict_get(symbol_table, key);
+  ParamList* param_list = ParamList_init(value->iks_type[LOCAL_SCOPE], NULL);
+
+  // $$ = param_list;
+}
 ;
+
 fp:
 TK_IDENTIFICADOR '(' '.' ')' {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);

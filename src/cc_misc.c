@@ -241,7 +241,6 @@ void declare_var(symbol* ident, int type, int vector_size, int scope) {
       exit(IKS_ERROR_DECLARED);
     }
   }
-  // printf("iks: %d %d\n",value->iks_type[0],value->iks_type[1]);
 }
 
 void declare_class(symbol* ident, ParamList* field_list) {
@@ -257,7 +256,7 @@ void declare_class(symbol* ident, ParamList* field_list) {
 }
 
 void ident_verify(symbol* ident, int scope, bool isVector) {
-  char* entry = dict_concat_key(ident->value.s,ident->type);
+  char* entry = dict_concat_key(ident->value.s, ident->type);
   symbol* value = dict_get(symbol_table,entry);
 
   if(value != NULL){

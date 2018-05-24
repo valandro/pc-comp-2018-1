@@ -17,6 +17,8 @@
 #define IKS_ERROR_EXCESS_ARGS 10     //sobram argumentos
 #define IKS_ERROR_WRONG_TYPE_ARGS 11 //argumentos incompatíveis
 
+#define IKS_ERROR_CLASS_INVALID_FIELD 12
+
 
 /* ETAPA 4 */
 #define IKS_NOT_SET_VALUE -1        // iks ainda não foi salvo na tabela
