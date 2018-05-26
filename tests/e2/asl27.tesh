@@ -1,0 +1,3 @@
+! timeout 3
+! output ignore
+$ ./main ./tests/e2/input/asl27
