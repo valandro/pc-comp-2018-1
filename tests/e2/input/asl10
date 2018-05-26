@@ -1,0 +1,3 @@
+//o nome do tipo é aquele utilizado depois da palavra reservada class quando este foi declarado.
+//ERROR: tipo de usuário não declarado
+ASL_t v;

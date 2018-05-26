@@ -1,0 +1,7 @@
+//A linguagem inclui também a declaração de vetores, feita pela
+//definição de seu tamanho inteiro positivo entre colchetes, colocada
+//à direita do nome, ou seja, ao final da declaração.
+//vetores globais
+static int v1[2];
+
+
