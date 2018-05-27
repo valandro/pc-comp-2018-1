@@ -1,4 +1,4 @@
 ! timeout 5
 ! output ignore
 ! expect return 1
-$ ./main ./e4/input/qwe02
+$ ./main ./tests/e4/input/qwe02
