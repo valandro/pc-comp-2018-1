@@ -36,13 +36,13 @@ for file in $(ls e4/input/qwe??); do
     echo "! timeout 5" > $TARGET;
     echo "! output ignore" >> $TARGET;
     if [ -n "$CODESTR" ]; then echo "! expect return $CODE" >> $TARGET; fi;
-    echo "$ ./main ./$file" >> $TARGET;
+    echo "$ ./main ./tests/$file" >> $TARGET;
 
     TARGETVAL="$(dirname $file)/valgrind_$(basename $file).tesh";
     echo "! timeout 6" > $TARGETVAL;
     echo "! output ignore" >> $TARGETVAL;
     if [ -n "$CODESTR" ]; then echo "! expect return $CODE" >> $TARGETVAL; fi;
-    echo "$ ./tests/scripts/valgrindtest ./main ./$file" >> $TARGETVAL;
+    echo "$ ./tests/scripts/valgrindtest ./main ./tests/$file" >> $TARGETVAL;
 done
 mv ./e4/input/*.tesh ./e4/
 #+end_src
