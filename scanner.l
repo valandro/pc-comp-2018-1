@@ -1,5 +1,5 @@
 /*
-  GAMMA
+  GAMMA - Lucas Valandro e Francisco Knebel
 */
 %{
 #include "parser.h" //arquivo automaticamente gerado pelo bison

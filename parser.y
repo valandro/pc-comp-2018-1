@@ -1,21 +1,14 @@
 /*
-  GAMMA
+  GAMMA - Lucas Valandro e Francisco Knebel
 */
 %code requires{
 #include "main.h"
 #include "cc_tree.h"
 comp_tree_t* tree;
-comp_tree_t* last_function;
-comp_tree_t* list_exp;
-
 }
-// Inicializando contador que identifica a primeira função
-%{
-  int count = 0;
-  int pcount = 0;  
-%}
 /* Declaração dos tokens da linguagem */
 /* Palavras Reservadas */
+
 %token TK_PR_INT
 %token TK_PR_FLOAT
 %token TK_PR_BOOL
@@ -82,6 +75,7 @@ comp_tree_t* list_exp;
 %type <node> dec_func
 %type <node> command_block
 %type <node> simple_commands
+%type <node> commands
 %type <node> attribution
 %type <node> expression
 %type <node> control_flow
@@ -107,7 +101,6 @@ comp_tree_t* list_exp;
 %type <valor_lexico> TK_LIT_CHAR
 %type <valor_lexico> TK_LIT_STRING
 %type <valor_lexico> TK_IDENTIFICADOR
-
 
 %union
 {
@@ -158,22 +151,14 @@ body:
 body dec_var_new_type ';'|
 body dec_var_global ';' |
 body dec_func {
-  comp_tree_t* first;
-
-  $$ = first;
-  //Se não for a primeira função, concatena na ultima função
-  if(count > 0) {
-    tree_insert_node(last_function,$2);
-  }
-
-  last_function = $2;
-  count++;
-
-  if(count == 1){
-    first = $2;
+  if($2 != NULL && $1 != NULL){
+    $$ = $1;
+    tree_insert_node($$,$2);
+  } else if($2 != NULL){
     $$ = $2;
+  } else {
+    $$ = $1;
   }
-
 }|
 /* empty */ {$$ = NULL;}
 ;
@@ -195,7 +180,6 @@ declare vector |
 TK_PR_STATIC declare vector |
 TK_PR_CLASS declare vector |
 TK_PR_STATIC TK_PR_CLASS declare vector
-
 ;
 
 declare:
@@ -208,14 +192,14 @@ vector:
 ;
 
 dec_func:
-TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' '{' simple_commands '}' {
+TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' '{' commands '}' {
   $$ = ast_make_tree(AST_FUNCAO, $3);
   if ($8 != NULL)
   {
     tree_insert_node($$, $8);
   }
 }|
-type TK_IDENTIFICADOR '(' list_params ')' '{' simple_commands '}' {
+type TK_IDENTIFICADOR '(' list_params ')' '{' commands '}' {
   $$ = ast_make_tree(AST_FUNCAO, $2);
   if ($7 != NULL)
   {
@@ -235,126 +219,59 @@ TK_PR_CONST type TK_IDENTIFICADOR
 ;
 
 command_block:
-'{' simple_commands '}' {
+'{' commands '}' {
     $$ = ast_make_tree(AST_BLOCO, NULL);
     if($2 != NULL) {
       tree_insert_node($$,$2);
     }
 }
 ;
-
+commands: 
+simple_commands commands {
+  if($2 != NULL && $1 != NULL){
+    $$ = $1;
+    tree_insert_node($$,$2);
+  } else if($2 != NULL){
+    $$ = $2;
+  } else {
+    $$ = $1;
+  }
+} | {$$ = NULL;}
+;
 simple_commands:
-simple_commands command_block ';' { 
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else {
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
+command_block ';'{
+  $$ = $1;
 }|
-simple_commands declare_var_local ';' {
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else {
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
+declare_var_local ';' {
+  $$ = $1;
 }|
-simple_commands attribution ';' {
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else {
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
+attribution ';' {
+  $$ = $1;
 }|
-simple_commands input ';' {
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else {
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
+input ';' {
+  $$ = $1;
 }|
-simple_commands output ';' {
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else {
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
+output ';' {
+  $$ = $1;
 }|
-simple_commands shift  ';' {
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else {
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
+shift  ';' {
+  $$ = $1;
 }|
-simple_commands func_call ';' {
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else if($2 != NULL){
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
+func_call ';' {
+  $$ = $1;
 }|
-simple_commands conditional  ';' {
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else if($2 != NULL){
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
+conditional  ';' {
+  $$ = $1;
 }|
-simple_commands iterative ';' {
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else if($2 != NULL){
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
+iterative ';' {
+  $$ = $1;
 }|
-simple_commands switch {
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else {
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
+switch {
+  $$ = $1;
 }|
-simple_commands control_flow ';' {
-  if($$ == NULL){
-   $$ = $2;
-   $$->last = $2;
-  }
-  else if($2 != NULL){
-   tree_insert_node($$->last,$2);
-   $$->last = $2;
-  }
-}|
-/* empty */ {$$ = NULL;}
+control_flow ';' {
+  $$ = $1;
+}
 ;
 
 declare_var_local:
