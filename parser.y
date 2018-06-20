@@ -5,6 +5,7 @@
 #include "main.h"
 #include "cc_tree.h"
 comp_tree_t* tree;
+extern comp_dict_t* symbol_table;
 }
 /* Declaração dos tokens da linguagem */
 /* Palavras Reservadas */
@@ -104,6 +105,9 @@ comp_tree_t* tree;
 %type <type> type
 %type <type> param
 
+%type <param_list> list_params
+%type <param_list> list_fields
+
 %union
 {
   symbol* valor_lexico;
@@ -186,10 +190,10 @@ encap type TK_IDENTIFICADOR  {
 ;
 
 dec_var_global:
-declare vector |
-TK_PR_STATIC declare vector |
-TK_PR_CLASS declare vector |
-TK_PR_STATIC TK_PR_CLASS declare vector
+declare |
+TK_PR_STATIC declare |
+TK_PR_CLASS declare |
+TK_PR_STATIC TK_PR_CLASS declare
 ;
 
 declare:
@@ -210,16 +214,16 @@ TK_IDENTIFICADOR TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
 dec_func:
 TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' '{' commands '}' {
   $$ = ast_make_tree(AST_FUNCAO, $3);
-  if ($7 != NULL)
+  if ($8 != NULL)
   {
-    tree_insert_node($$, $7);
+    tree_insert_node($$, $8);
   }
 }|
 type TK_IDENTIFICADOR '(' list_params ')' '{' commands '}' {
   $$ = ast_make_tree(AST_FUNCAO, $2);
-  if ($6 != NULL)
+  if ($7 != NULL)
   {
-    tree_insert_node($$, $6);
+    tree_insert_node($$, $7);
   }
 }
 ;
