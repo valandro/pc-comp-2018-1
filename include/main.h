@@ -13,6 +13,7 @@
 #include "cc_ast.h"
 #include "cc_ast_f.h"
 #include "cc_gv.h"
+#include "cc_semantic.h"
 #include "parser.h"
 
 /*

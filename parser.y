@@ -101,11 +101,15 @@ comp_tree_t* tree;
 %type <valor_lexico> TK_LIT_CHAR
 %type <valor_lexico> TK_LIT_STRING
 %type <valor_lexico> TK_IDENTIFICADOR
+%type <type> type
+%type <type> param
 
 %union
 {
   symbol* valor_lexico;
   comp_tree_t* node;
+  int type;
+  ParamList* param_list;
 }
 
 %start program
@@ -113,11 +117,11 @@ comp_tree_t* tree;
 /* Regras (e ações) da gramática */
 /* Regras de apoio - Começo */
 type:
-TK_PR_INT |
-TK_PR_FLOAT |
-TK_PR_CHAR |
-TK_PR_BOOL |
-TK_PR_STRING
+TK_PR_INT    {$$ = IKS_INT;}  |
+TK_PR_FLOAT  {$$ = IKS_FLOAT;}|
+TK_PR_CHAR   {$$ = IKS_CHAR;} |
+TK_PR_BOOL   {$$ = IKS_BOOL;} |
+TK_PR_STRING {$$ = IKS_STRING;}
 ;
 
 encap:
@@ -164,16 +168,22 @@ body dec_func {
 ;
 
 dec_var_new_type:
-TK_PR_CLASS TK_IDENTIFICADOR '[' list_fields ']'
+TK_PR_CLASS TK_IDENTIFICADOR '[' list_fields ']' {
+  declare_class($2, $4);
+}
 ;
 
 list_fields:
-list_fields ':' field |
-field
+encap type TK_IDENTIFICADOR ':' list_fields {
+  // Adiciona argumentos na lista.
+  $$ = ParamList_addParam($5, $2, $3->value.s);
+} |
+encap type TK_IDENTIFICADOR  {
+  // Último parâmetro da lista, inicia lista de argumentos.
+  ParamList* param_list = ParamList_init($2, $3->value.s);
+  $$ = param_list;
+}
 ;
-
-field:
-encap type TK_IDENTIFICADOR ;
 
 dec_var_global:
 declare vector |
@@ -183,39 +193,58 @@ TK_PR_STATIC TK_PR_CLASS declare vector
 ;
 
 declare:
-type TK_IDENTIFICADOR |
-TK_IDENTIFICADOR TK_IDENTIFICADOR
-;
-
-vector:
-'[' TK_LIT_INT ']' |
+type TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
+  declare_var($2,$1,$4->value.i, GLOBAL_SCOPE);
+}|
+type TK_IDENTIFICADOR {
+  declare_var($2,$1,IKS_NON_VECTOR, GLOBAL_SCOPE);
+}|
+TK_IDENTIFICADOR TK_IDENTIFICADOR {
+  declare_var($2,IKS_USER_TYPE,IKS_NON_VECTOR, GLOBAL_SCOPE);   
+}|
+TK_IDENTIFICADOR TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
+  declare_var($2,IKS_USER_TYPE,$4->value.i, GLOBAL_SCOPE);   
+}
 ;
 
 dec_func:
 TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' '{' commands '}' {
   $$ = ast_make_tree(AST_FUNCAO, $3);
-  if ($8 != NULL)
+  if ($7 != NULL)
   {
-    tree_insert_node($$, $8);
+    tree_insert_node($$, $7);
   }
 }|
 type TK_IDENTIFICADOR '(' list_params ')' '{' commands '}' {
   $$ = ast_make_tree(AST_FUNCAO, $2);
-  if ($7 != NULL)
+  if ($6 != NULL)
   {
-    tree_insert_node($$, $7);
+    tree_insert_node($$, $6);
   }
 }
 ;
 
 list_params:
-param ',' list_params |
-param |
+param ',' list_params {
+  // Adiciona argumentos na lista.
+  $$ = ParamList_addParam($3, $1, NULL);
+}|
+param {
+  // Último parâmetro da lista, inicia lista de argumentos.
+  ParamList* param_list = ParamList_init($1, NULL);
+  $$ = param_list;
+}| {
+  $$ = NULL;
+}
 ;
 
 param:
-type TK_IDENTIFICADOR |
-TK_PR_CONST type TK_IDENTIFICADOR
+type TK_IDENTIFICADOR {
+  $$ = $1;
+}|
+TK_PR_CONST type TK_IDENTIFICADOR {
+  $$ = $2; 
+}
 ;
 
 command_block:
@@ -276,52 +305,36 @@ control_flow ';' {
 
 declare_var_local:
 TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR init{
-  if($5 != NULL){
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $4);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $5);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
+  declare_var($4,$3,IKS_NON_VECTOR, LOCAL_SCOPE);  
 }|
 TK_PR_STATIC type TK_IDENTIFICADOR init {
-  if($4 != NULL){  
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
+  declare_var($3,$2,IKS_NON_VECTOR, LOCAL_SCOPE);      
 }|
 TK_PR_CONST type TK_IDENTIFICADOR init {
-  if($4 != NULL){    
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
+  declare_var($3,$2,IKS_NON_VECTOR, LOCAL_SCOPE);        
 }|
 type TK_IDENTIFICADOR init {
-  if($3 != NULL){
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $2);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $3);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$2,$3);
+  declare_var($2,$1,IKS_NON_VECTOR, LOCAL_SCOPE);  
 }|
 TK_PR_STATIC TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  if($5 != NULL){
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $4);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $5);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
+  declare_var($4,IKS_USER_TYPE,IKS_NON_VECTOR, LOCAL_SCOPE);    
 }|
 TK_PR_STATIC TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  if($4 != NULL){      
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
+  declare_var($3,IKS_USER_TYPE,IKS_NON_VECTOR, LOCAL_SCOPE);      
 }|
 TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  if($4 != NULL){
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3); 
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $4);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
+  declare_var($3,IKS_USER_TYPE,IKS_NON_VECTOR, LOCAL_SCOPE);        
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  if($3 != NULL){
-    comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $2);
-    $$ = ast_make_binary_node(AST_DEC_INIT, ident_node, $3);
-  }
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$2,$3);
+  declare_var($2,IKS_USER_TYPE,IKS_NON_VECTOR, LOCAL_SCOPE);        
 }
 ;
 
@@ -334,7 +347,6 @@ TK_OC_LE lit { $$ = ast_make_tree(AST_LITERAL, $2); }|
 attribution:
 TK_IDENTIFICADOR '=' expression {
   comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $1);
-
   $$ = ast_make_binary_node(AST_ATRIBUICAO, ident_node, $3);
 }|
 TK_IDENTIFICADOR '[' expression ']' '=' expression {
@@ -346,6 +358,26 @@ TK_IDENTIFICADOR '[' expression ']' '=' expression {
 TK_IDENTIFICADOR '.' TK_IDENTIFICADOR '=' expression {
   comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $1);
   comp_tree_t* ident_node_campo = ast_make_tree(AST_IDENTIFICADOR, $3);
+
+  char* key = dict_concat_key($1->value.s, $1->type);
+  symbol* value = dict_get(symbol_table, key);
+
+  int achou = 0;
+  ParamList* previous = NULL;
+  ParamList* current = value->field_list;
+  do {
+    if(strcmp(current->identificador, $3->value.s) == 0) {
+      achou = 1;
+    } else {
+      previous = current;
+      current = current->next;
+    }
+  } while(previous->next != NULL && achou == 0);
+
+  if(achou == 0) {
+    // Campo da classe inválido.
+    exit(IKS_ERROR_CLASS_INVALID_FIELD);
+  }
 
   comp_tree_t* vetor_tree_node = ast_make_binary_node(AST_TIPO_CAMPO, ident_node, ident_node_campo);
   $$ = ast_make_binary_node(AST_ATRIBUICAO, vetor_tree_node, $5);
@@ -405,12 +437,44 @@ TK_IDENTIFICADOR '(' func_params ')' TK_OC_U2 fp pipes {
 
 func_params:
 expression ',' func_params {
-  if($3 != NULL){
-    tree_insert_node($$,$3);   
-  }
+  // TODO: fix árvore de paramêtros da função
+  // if($3 != NULL){
+  //   tree_insert_node($$,$3);   
+  // }
+
+  // Adiciona argumentos na lista.
+  // $$ = ParamList_addParam($3, $1, NULL);
 }|
-expression
+expression {
+  ast_node_t* node_ast = (ast_node_t*) $1->value;
+  symbol* data = node_ast->value.data;
+
+  char key[1000]; // Magic number
+  switch(data->type) {
+    case POA_LIT_INT:  
+      sprintf(key, "%d$%d", data->value.i, (int)data->type);
+      break;
+    case POA_LIT_FLOAT:
+      sprintf(key, "%f$%d", data->value.f, (int)data->type);
+      break;
+    case POA_LIT_CHAR:
+      sprintf(key, "%c$%d", data->value.c, (int)data->type);
+      break;
+    case POA_LIT_STRING:
+      sprintf(key, "%s$%d", data->value.s, (int)data->type);
+      break;
+    case POA_IDENT:
+      sprintf(key, "%s$%d", data->value.s, (int)data->type);
+      break;
+  }
+
+  symbol* value = dict_get(symbol_table, key);
+  ParamList* param_list = ParamList_init(value->iks_type[LOCAL_SCOPE], NULL);
+
+  // $$ = param_list;
+}
 ;
+
 fp:
 TK_IDENTIFICADOR '(' '.' ')' {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
@@ -462,7 +526,7 @@ TK_IDENTIFICADOR TK_OC_SR TK_LIT_INT {
 list_exp:
 expression ',' list_exp {
   if($3 != NULL){
-   tree_insert_node($$,$3);   
+    tree_insert_node($$,$3);   
   }
 }|
 expression
@@ -579,10 +643,14 @@ expression TK_OC_SR expression { $$ = ast_make_binary_node(AST_SHIFT_RIGHT, $1, 
 TK_LIT_INT { $$ = ast_make_tree(AST_LITERAL, $1); }|
 TK_LIT_FLOAT { $$ = ast_make_tree(AST_LITERAL, $1); }|
 func_call { $$ = $1; }|
-TK_IDENTIFICADOR { $$ = ast_make_tree(AST_IDENTIFICADOR, $1); }|
+TK_IDENTIFICADOR {
+  $$ = ast_make_tree(AST_IDENTIFICADOR, $1); 
+  ident_verify($1,LOCAL_SCOPE,IKS_NON_VECTOR);
+}|
 TK_IDENTIFICADOR '['expression']' {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
   $$ = ast_make_binary_node(AST_VETOR_INDEXADO, ident_tree, $3);
+  ident_verify($1,LOCAL_SCOPE,IKS_VECTOR);  
 }
 ;
 %%

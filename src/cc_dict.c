@@ -205,13 +205,11 @@ void *dict_get(comp_dict_t * dict, char *key)
   if (dict == NULL || dict->data == NULL || key == NULL) {
     ERRO("At least one parameter is NULL");
   }
-
   int hash = generate_hash(key, dict->size);
   comp_dict_item_t *item = NULL;
 
   if (dict->data[hash]) {
     item = dict_item_get(dict->data[hash], key);
-
     if(item == NULL)
       return NULL;
     else
@@ -244,4 +242,14 @@ void *dict_remove(comp_dict_t * dict, char *key)
   }
 
   return data;
+}
+char* dict_concat_key(char* key, size_t type){
+  int int_value = type;
+  char c[10];
+  sprintf(c, "%d", int_value);
+  // Combinando valor da lexema com tipo do token, com $ como separador
+  strcat(key, "$");
+  strcat(key, c);
+
+  return key;
 }

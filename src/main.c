@@ -123,7 +123,7 @@ int main_avaliacao_etapa_3 (int argc, char **argv)
 
 int main_avaliacao_etapa_4 (int argc, char **argv)
 {
-  return main_avaliacao_etapa_2 (argc, argv);
+  return main_avaliacao_etapa_3 (argc, argv);
 }
 
 int main_avaliacao_etapa_5 (int argc, char **argv)

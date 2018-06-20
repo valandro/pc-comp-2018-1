@@ -39,7 +39,17 @@ Para executar todos os testes da etapa, utilize "ctest -R e1".
 
 Para executar os testes individualmente, utilize "ctest -R e1_avaliacao_00 -V".
 
+Teste etapa 3: "make && cat ./file.txt | ./main; dot -Tpng e3.dot -ofilename.png"
+
+* Configurar Makefiles para Etapa
+Para configurar o sistema de compilação para uma determinada etapa, os passos abaixo devem ser realizados (supondo etapa 2).
+
+#+begin_src shell :results output
+
+cmake -DE1=OFF -DE2=ON .
+
+make
+#+end_src
 
 * Documentação
 
-Teste etapa 3: "make && cat ./file.txt | ./main; dot -Tpng e3.dot -ofilename.png"
