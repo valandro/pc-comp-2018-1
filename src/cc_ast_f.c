@@ -1,3 +1,7 @@
+/*
+  GAMMA - Lucas Valandro e Francisco Knebel
+  UFRGS 2018
+*/
 #include "cc_tree.h"
 #include "cc_misc.h"
 

@@ -1,5 +1,6 @@
 /*
   GAMMA - Lucas Valandro e Francisco Knebel
+  UFRGS 2018
 */
 %code requires{
 #include "main.h"

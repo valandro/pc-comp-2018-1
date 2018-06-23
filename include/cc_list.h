@@ -1,3 +1,8 @@
+/*
+  GAMMA - Lucas Valandro e Francisco Knebel
+  UFRGS 2018
+*/
+
 #ifndef __LIST_H
 #define __LIST_H
 

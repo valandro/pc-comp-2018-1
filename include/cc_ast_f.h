@@ -1,7 +1,7 @@
 /* 
   Funções para manipulação de AST.
 
-  Francisco Knebel || Lucas Valandro
+  GAMMA - Francisco Knebel || Lucas Valandro
   UFRGS 2018
 */
 
