@@ -14,6 +14,8 @@
 #include "cc_ast_f.h"
 #include "cc_gv.h"
 #include "cc_semantic.h"
+#include "cc_code_list.h"
+#include "cc_cod.h"
 #include "parser.h"
 
 /*
