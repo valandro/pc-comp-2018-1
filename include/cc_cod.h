@@ -27,10 +27,11 @@ int cod_sizeOf(int var_type);
 // Funções de geração de código
 void cod_generate(comp_tree_t* node);
 
-void cod_generate_arithmetic(comp_tree_t* node, char* op);
 void cod_generate_literal(comp_tree_t* tree);
 void cod_generate_identificador(comp_tree_t *tree);
 void cod_generate_atribuicao(comp_tree_t *tree);
+
+void cod_generate_arithmetic(comp_tree_t *node, char *op);
 void cod_generate_arithmetic_invert(comp_tree_t* node);
 
 #endif

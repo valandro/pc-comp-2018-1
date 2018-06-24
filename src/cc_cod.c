@@ -100,18 +100,18 @@ void cod_generate(comp_tree_t* node) {
     // case AST_BLOCO:
 
     /* Nodos aritméticos */
-    // case AST_ARIM_SOMA:
-    //   cod_generate_arithmetic(node, "add");
-    //   break;
-    // case AST_ARIM_SUBTRACAO:
-    //   cod_generate_arithmetic(node, "sub");
-    //   break;
-    // case AST_ARIM_MULTIPLICACAO:
-    //   cod_generate_arithmetic(node, "mult");
-    //   break;
-    // case AST_ARIM_DIVISAO:
-    //   cod_generate_arithmetic(node, "div");
-    //   break;
+    case AST_ARIM_SOMA:
+      cod_generate_arithmetic(node, "add");
+      break;
+    case AST_ARIM_SUBTRACAO:
+      cod_generate_arithmetic(node, "sub");
+      break;
+    case AST_ARIM_MULTIPLICACAO:
+      cod_generate_arithmetic(node, "mult");
+      break;
+    case AST_ARIM_DIVISAO:
+      cod_generate_arithmetic(node, "div");
+      break;
     // case AST_ARIM_INVERSAO:
     //   cod_generate_arithmetic_invert(node);
     //   break;
@@ -155,7 +155,7 @@ void cod_generate(comp_tree_t* node) {
 
   if(naoachou == 1) {
     // FUNÇÃO DE TESTE, REMOVER ANTES DE ENVIAR A ETAPA, APENAS PARA AVISAR CASO ENTRAR EM GENERATE SEM CASE
-    printf("__GENERATE CODE: Não achou case para AST tipo %d. Necessário implementar.__\n", nodeType);
+    printf("__GENERATE CODE: Não achou case para AST tipo %d. FIX CASE.__\n", nodeType);
   }
 }
 
@@ -214,23 +214,25 @@ void cod_generate_atribuicao(comp_tree_t* node)
   comp_tree_t *identificador = node->first;
   comp_tree_t *expressao = node->first->next;
 
-  ast_node_t *ast_node  = node->value;
   ast_node_t *ast_id    = identificador->value;
   ast_node_t *ast_exp   = expressao->value;
 
-  symbol* id = ast_id->value.data;
-
-  int regEntrada = ast_exp->reg; 
 
   char* code = malloc(COD_MAX_SIZE);
   int address_offset = ast_id->offset;
 
+  symbol* sid = ast_id->value.data;
+  symbol* sexp = ast_exp->value.data;
+
+  // printf("0: %d %d %d %d\n", snode->type, snode->iks_type[0], snode->iks_type[1], snode->value.i);
+  printf("TESTE DE ESCOPO: %d %d\n", (int) sid->iks_type[0], (int) sid->iks_type[1]);
+
   // TODO: Verificar escopo para atribuição local ou global
   // SE ESCOPO GLOBAL: registrador rbss
-  snprintf(code, COD_MAX_SIZE, "storeAI r%d => rbss, %d\n", regEntrada, address_offset);
+  snprintf(code, COD_MAX_SIZE, "storeAI r%d => rbss, %d\n", ast_exp->reg, address_offset);
 
   // SE ESCOPO LOCAL: registrador rarp
-  // snprintf(code, COD_MAX_SIZE, "storeAI r%d => rarp\n", regEntrada, address_offset);
+  // snprintf(code, COD_MAX_SIZE, "storeAI r%d => rarp\n", ast_exp->reg, address_offset);
 
   CodeList_add(generatedILOC, code);
 }
@@ -239,23 +241,32 @@ void cod_generate_atribuicao(comp_tree_t* node)
   Criação de código para operação aritmética.
   Recebe o nodo e o operador ILOC da operação desejada.
 */
-void cod_generate_arithmetic(comp_tree_t* node, char* op) {
+void cod_generate_arithmetic(comp_tree_t * node, char *op) {
   // Pegar valores dos registradores da operação que estão no nodo.
-  int reg_1 = 0; // node->...;
-  int reg_2 = 0; // node->...;
+  comp_tree_t *operador1 = node->first;
+  comp_tree_t *operador2 = node->first->next;
+
+  ast_node_t *ast_exp = node->value;
+  ast_node_t *ast_op1 = operador1->value;
+  ast_node_t *ast_op2 = operador2->value;
+
+  int reg_1 = ast_op1->reg;
+  int reg_2 = ast_op2->reg;
 
   // Gerar registrador temporário para o alvo.
   int reg_alvo = cod_generateTempRegister();
 
   // Gerar instrução
-  char* code = malloc(COD_MAX_SIZE);
+  char *code = malloc(COD_MAX_SIZE);
   snprintf(
-    code, COD_MAX_SIZE,
-    "%s r%d, r%d => r%d\n",
-    op, reg_1, reg_2, reg_alvo
-  );
+      code, COD_MAX_SIZE,
+      "%s r%d, r%d => r%d\n",
+      op, reg_1, reg_2, reg_alvo);
 
-  // Instrução gerada. Salvar na árvore junto com o restante do código gerado.
+  // Salvo registrador temporário de saída
+  ast_exp->reg = reg_alvo;
+
+  CodeList_add(generatedILOC, code);
 };
 
 void cod_generate_arithmetic_invert(comp_tree_t* node) {};
