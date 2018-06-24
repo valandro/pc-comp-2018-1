@@ -22,4 +22,6 @@ comp_tree_t* ast_make_ternary_node(int type, comp_tree_t *node1, comp_tree_t *no
 comp_tree_t* ast_make_unary_node(int type, comp_tree_t *node);
 comp_tree_t* ast_dec_init(int type, symbol* node1, comp_tree_t* node2);
 
+comp_tree_t *comp_t_get_next(comp_tree_t *ptr);
+
 #endif

@@ -38,6 +38,8 @@ typedef struct {
 typedef struct ast_node
 {
   int type;
+  int reg; // registrador temporário
+  int offset;
   union
   {
     symbol* data;

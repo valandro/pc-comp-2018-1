@@ -3,7 +3,8 @@
   UFRGS 2018
 */
 
-#include "cc_misc.h"
+#include "main.h"
+#include "cc_code_list.h"
 
 extern int yylineno;
 extern char *yytext;

@@ -3,10 +3,34 @@
   UFRGS 2018
 */
 
+#include <stdio.h>
+
 #include "cc_cod.h"
+#include "main.h"
+
+extern CodeList* generatedILOC;
+unsigned int global_offset = 0;
+unsigned int local_offset = 0;
 
 unsigned int registerIndex = 0;
 unsigned int labelIndex = 0;
+
+// Atualiza o contador de offset e retorna o valor original
+unsigned int cod_offsetAndUpdate_global(int size)
+{
+  int returnValue = global_offset;
+
+  global_offset += size;
+  return returnValue;
+}
+
+unsigned int cod_offsetAndUpdate_local(int size)
+{
+  int returnValue = local_offset;
+
+  local_offset += size;
+  return returnValue;
+}
 
 unsigned int cod_generateTempRegister() {
   return registerIndex++;

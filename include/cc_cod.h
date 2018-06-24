@@ -15,6 +15,9 @@
 #define COD_LABEL_LENGTH 10
 #define COD_MAX_SIZE 30
 
+unsigned int cod_offsetAndUpdate_global(int size);
+unsigned int cod_offsetAndUpdate_local(int size);
+
 unsigned int cod_generateTempRegister();
 unsigned int cod_generateLabel();
 char* cod_generateLabelName(int index);
