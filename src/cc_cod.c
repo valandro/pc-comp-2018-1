@@ -128,14 +128,11 @@ void cod_generate(comp_tree_t* node) {
     // case AST_LOGICO_COMP_NEGACAO:
     //   cod_generate_logic(node, type);
     //   break;
-    // /* Nodos de varíaveis e valores */
-    // case AST_LITERAL:
-    // case AST_IDENTIFICADOR:
     /* Nodos de varíaveis e valores */
     case AST_LITERAL: cod_generate_literal(node); break;
+    case AST_IDENTIFICADOR: cod_generate_identificador(node); break;
+    case AST_ATRIBUICAO: cod_generate_atribuicao(node); break;
     // case AST_VETOR_INDEXADO:
-    // case AST_ATRIBUICAO:
-
 
     // case AST_CHAMADA_DE_FUNCAO:
     // case AST_SHIFT_RIGHT:
@@ -183,6 +180,58 @@ void cod_generate_literal(comp_tree_t *node) {
 
   // Salva registrador temporário na AST e insere o código gerado na lista.
   ast_node->reg = tempReg;
+  CodeList_add(generatedILOC, code);
+}
+
+void cod_generate_identificador(comp_tree_t *tree) {
+  ast_node_t* node = tree->value;
+  symbol* data = node->value.data;
+
+  char* code = malloc(COD_MAX_SIZE);
+  int tempReg = cod_generateTempRegister();
+
+  // TODO: pegar valor de offset de acordo com o _tipo_ salvo no nodo
+  // Gambiarra aqui, só funciona com int.
+  int var_offset = sizeof(int);
+
+  // TODO: Verificar escopo para criação local ou global
+  // SE ESCOPO GLOBAL: registrador rbss
+  int address_offset = cod_offsetAndUpdate_global(var_offset);
+  snprintf(code, COD_MAX_SIZE, "loadAI rbss, %d => r%d\n", address_offset, tempReg);
+
+  // SE ESCOPO LOCAL: registrador rarp
+  // int address_offset = cod_offsetAndUpdate_local(var_offset);
+  // snprintf(code, COD_MAX_SIZE, "loadAI rarp, %d => r%d\n", address_offset, tempReg);
+
+  node->reg = tempReg;
+  node->offset = address_offset;
+
+  CodeList_add(generatedILOC, code);
+}
+
+void cod_generate_atribuicao(comp_tree_t* node)
+{
+  comp_tree_t *identificador = node->first;
+  comp_tree_t *expressao = node->first->next;
+
+  ast_node_t *ast_node  = node->value;
+  ast_node_t *ast_id    = identificador->value;
+  ast_node_t *ast_exp   = expressao->value;
+
+  symbol* id = ast_id->value.data;
+
+  int regEntrada = ast_exp->reg; 
+
+  char* code = malloc(COD_MAX_SIZE);
+  int address_offset = ast_id->offset;
+
+  // TODO: Verificar escopo para atribuição local ou global
+  // SE ESCOPO GLOBAL: registrador rbss
+  snprintf(code, COD_MAX_SIZE, "storeAI r%d => rbss, %d\n", regEntrada, address_offset);
+
+  // SE ESCOPO LOCAL: registrador rarp
+  // snprintf(code, COD_MAX_SIZE, "storeAI r%d => rarp\n", regEntrada, address_offset);
+
   CodeList_add(generatedILOC, code);
 }
 
