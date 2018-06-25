@@ -118,9 +118,16 @@ void cod_generate(comp_tree_t* node) {
       cod_generate_arithmetic_invert(node);
       break;
 
-    // /* Nodos de comparação lógica */
+    /* Shift */
+    case AST_SHIFT_RIGHT: cod_generate_arithmetic(node, "rshift"); break;
+    case AST_SHIFT_LEFT: cod_generate_arithmetic(node, "lshift"); break;
+
+    /* Nodos de comparação lógica */
+    // E // OU
     // case AST_LOGICO_E:
     // case AST_LOGICO_OU:
+
+    // Comparação booleana 
     // case AST_LOGICO_COMP_DIF:
     // case AST_LOGICO_COMP_IGUAL:
     // case AST_LOGICO_COMP_LE:
@@ -130,6 +137,8 @@ void cod_generate(comp_tree_t* node) {
     // case AST_LOGICO_COMP_NEGACAO:
     //   cod_generate_logic(node, type);
     //   break;
+
+
     /* Nodos de varíaveis e valores */
     case AST_LITERAL: cod_generate_literal(node); break;
     case AST_IDENTIFICADOR: cod_generate_identificador(node); break;
@@ -137,8 +146,7 @@ void cod_generate(comp_tree_t* node) {
     // case AST_VETOR_INDEXADO:
 
     // case AST_CHAMADA_DE_FUNCAO:
-    // case AST_SHIFT_RIGHT:
-    // case AST_SHIFT_LEFT:
+
     // case AST_BREAK:
     // case AST_CONTINUE:
     // case AST_CASE:
