@@ -102,25 +102,15 @@ void cod_generate(comp_tree_t* node) {
     // case AST_BLOCO:
 
     /* Nodos aritméticos */
-    case AST_ARIM_SOMA:
-      cod_generate_arithmetic(node, "add");
-      break;
-    case AST_ARIM_SUBTRACAO:
-      cod_generate_arithmetic(node, "sub");
-      break;
-    case AST_ARIM_MULTIPLICACAO:
-      cod_generate_arithmetic(node, "mult");
-      break;
-    case AST_ARIM_DIVISAO:
-      cod_generate_arithmetic(node, "div");
-      break;
-    case AST_ARIM_INVERSAO:
-      cod_generate_arithmetic_invert(node);
-      break;
+    case AST_ARIM_SOMA:           cod_generate_arithmetic(node, "add"); break;
+    case AST_ARIM_SUBTRACAO:      cod_generate_arithmetic(node, "sub"); break;
+    case AST_ARIM_MULTIPLICACAO:  cod_generate_arithmetic(node, "mult"); break;
+    case AST_ARIM_DIVISAO:        cod_generate_arithmetic(node, "div"); break;
+    case AST_ARIM_INVERSAO:       cod_generate_arithmetic_invert(node); break;
 
     /* Shift */
     case AST_SHIFT_RIGHT: cod_generate_arithmetic(node, "rshift"); break;
-    case AST_SHIFT_LEFT: cod_generate_arithmetic(node, "lshift"); break;
+    case AST_SHIFT_LEFT:  cod_generate_arithmetic(node, "lshift"); break;
 
     /* Nodos de comparação lógica */
     // E // OU
@@ -198,44 +188,39 @@ void cod_generate_identificador(comp_tree_t *tree) {
   symbol* data = node->value.data;
 
   char* code = malloc(COD_MAX_SIZE);
-  int tempReg = cod_generateTempRegister();
 
-  // TODO: pegar valor de offset de acordo com o _tipo_ salvo no nodo
-  // Gambiarra aqui, só funciona com int.
-  int var_offset = sizeof(int);
-
-  // TODO: Verificar escopo para criação local ou global
   char* entry = dict_concat_key(data->value.s, data->type);
   symbol* table_data = dict_get(symbol_table,entry);
 
-  int address_offset;
-
-
-  // SE ESCOPO GLOBAL: registrador rbss
-  printf("identificador id: %s \tglobal: %d \t\t local: %d\n",
+  printf("identificador id: %s \tglobal: %d \t\t local: %d \t\t vetor: %d\n",
     table_data->value.s,
     (int) table_data->iks_type[GLOBAL_SCOPE],
-    (int) table_data->iks_type[LOCAL_SCOPE]
+    (int) table_data->iks_type[LOCAL_SCOPE],
+    (int) table_data->vector_size
   );
 
+  int tempReg;
+  int address_offset;
   if(table_data->iks_type[GLOBAL_SCOPE] != IKS_NOT_SET_VALUE){
-    address_offset = cod_offsetAndUpdate_global(var_offset);
+    // SE ESCOPO GLOBAL: registrador rbss
+    tempReg = table_data->iks_reg[GLOBAL_SCOPE];
+    address_offset = table_data->mem_pos[GLOBAL_SCOPE];
     snprintf(code, COD_MAX_SIZE, "loadAI rbss, %d => r%d\n", address_offset, tempReg);
 
     node->reg = tempReg;
     node->offset = address_offset;
 
     CodeList_add_node(generatedILOC, code, node);
-  }
-  // SE ESCOPO LOCAL: registrador rarp
-  if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
-    address_offset = cod_offsetAndUpdate_local(var_offset);
+  } else if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
+    // SE ESCOPO LOCAL: registrador rarp
+    tempReg = table_data->iks_reg[LOCAL_SCOPE];
+    address_offset = table_data->mem_pos[LOCAL_SCOPE];
     snprintf(code, COD_MAX_SIZE, "loadAI rarp, %d => r%d\n", address_offset, tempReg);
-    node->reg = tempReg;
-    node->offset = address_offset;
-
-    CodeList_add_node(generatedILOC, code, node);
   }
+  node->reg = tempReg;
+  node->offset = address_offset;
+
+  CodeList_add_node(generatedILOC, code, node);
 }
 
 void cod_generate_atribuicao(comp_tree_t* node)

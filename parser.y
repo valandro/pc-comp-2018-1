@@ -311,36 +311,36 @@ control_flow ';' {
 
 declare_var_local:
 TK_PR_STATIC TK_PR_CONST type TK_IDENTIFICADOR init{
-  $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
   declare_var($4,$3,IKS_NON_VECTOR, LOCAL_SCOPE);  
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
 }|
 TK_PR_STATIC type TK_IDENTIFICADOR init {
-  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
   declare_var($3,$2,IKS_NON_VECTOR, LOCAL_SCOPE);      
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
 }|
 TK_PR_CONST type TK_IDENTIFICADOR init {
+  declare_var($3,$2,IKS_NON_VECTOR, LOCAL_SCOPE);     
   $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
-  declare_var($3,$2,IKS_NON_VECTOR, LOCAL_SCOPE);        
 }|
 type TK_IDENTIFICADOR init {
+  declare_var($2,$1,IKS_NON_VECTOR, LOCAL_SCOPE);
   $$ = ast_dec_init(AST_IDENTIFICADOR,$2,$3);
-  declare_var($2,$1,IKS_NON_VECTOR, LOCAL_SCOPE);  
 }|
 TK_PR_STATIC TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
   declare_var($4,IKS_USER_TYPE,IKS_NON_VECTOR, LOCAL_SCOPE);    
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$4,$5);
 }|
 TK_PR_STATIC TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
   declare_var($3,IKS_USER_TYPE,IKS_NON_VECTOR, LOCAL_SCOPE);      
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
 }|
 TK_PR_CONST TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
   declare_var($3,IKS_USER_TYPE,IKS_NON_VECTOR, LOCAL_SCOPE);        
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$3,$4);
 }|
 TK_IDENTIFICADOR TK_IDENTIFICADOR init {
-  $$ = ast_dec_init(AST_IDENTIFICADOR,$2,$3);
   declare_var($2,IKS_USER_TYPE,IKS_NON_VECTOR, LOCAL_SCOPE);        
+  $$ = ast_dec_init(AST_IDENTIFICADOR,$2,$3);
 }
 ;
 

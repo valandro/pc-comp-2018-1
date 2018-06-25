@@ -81,9 +81,13 @@ symbol* insert_symbol_table(int token, int type) {
     // Lexema não encontrado, inserindo elemento no array de dados
     symbol element;
     element.line = yylineno;
-    element.iks_type[0] = IKS_NOT_SET_VALUE; // O tipo da variavél ainda não foi setado. Escopo Global
-    element.iks_type[1] = IKS_NOT_SET_VALUE; // O tipo da variavél ainda não foi setado. Escopo Local    
-    element.vector_size = IKS_NON_VECTOR ;
+    element.iks_type[GLOBAL_SCOPE] = IKS_NOT_SET_VALUE; // O tipo da variavél ainda não foi setado. Escopo Global
+    element.iks_type[LOCAL_SCOPE] = IKS_NOT_SET_VALUE; // O tipo da variavél ainda não foi setado. Escopo Local    
+    element.vector_size = IKS_NON_VECTOR;
+    element.mem_pos[GLOBAL_SCOPE] = IKS_NOT_SET_VALUE;
+    element.mem_pos[LOCAL_SCOPE] = IKS_NOT_SET_VALUE;
+    element.iks_reg[GLOBAL_SCOPE] = IKS_NOT_SET_VALUE;
+    element.iks_reg[LOCAL_SCOPE] = IKS_NOT_SET_VALUE;
 
     switch (token) {
       case TK_LIT_INT: {
@@ -219,6 +223,18 @@ void declare_var(symbol* ident, int type, int vector_size, int scope) {
     if(value->iks_type[scope] == IKS_NOT_SET_VALUE){
       value->iks_type[scope] = type;
       value->vector_size = vector_size;
+
+      if(vector_size != IKS_NON_VECTOR) {
+        value->mem_pos[GLOBAL_SCOPE] = cod_offsetAndUpdate_global(vector_size * cod_sizeOf(type));
+      } else if(scope == GLOBAL_SCOPE) {
+        value->mem_pos[GLOBAL_SCOPE] = cod_offsetAndUpdate_global(cod_sizeOf(type));
+      } else {
+        value->mem_pos[LOCAL_SCOPE] = cod_offsetAndUpdate_local(cod_sizeOf(type));
+      }
+
+      if(value->iks_reg[scope] == IKS_NOT_SET_VALUE) {
+        value->iks_reg[scope] = cod_generateTempRegister();
+      }
     } else {
       exit(IKS_ERROR_DECLARED);
     }

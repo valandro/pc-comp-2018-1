@@ -20,10 +20,12 @@ union tValue {
 };
 
 typedef struct {
-  size_t line;
-  size_t type;
-  size_t iks_type[2];
-  size_t vector_size;
+  int line;
+  int type;
+  int iks_type[2];
+  int iks_reg[2];
+  int mem_pos[2];
+  int vector_size;
 
   ParamList* field_list;
   union tValue value;
