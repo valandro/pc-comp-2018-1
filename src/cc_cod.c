@@ -195,18 +195,33 @@ void cod_generate_identificador(comp_tree_t *tree) {
   int var_offset = sizeof(int);
 
   // TODO: Verificar escopo para criação local ou global
+  char* entry = dict_concat_key(data->value.s, data->type);
+  symbol* table_data = dict_get(symbol_table,entry);
+
+  int address_offset;
+
+
   // SE ESCOPO GLOBAL: registrador rbss
-  int address_offset = cod_offsetAndUpdate_global(var_offset);
-  snprintf(code, COD_MAX_SIZE, "loadAI rbss, %d => r%d\n", address_offset, tempReg);
+  printf("id: %s \tglobal: %d \t\t local: %d\n",table_data->value.s,table_data->iks_type[GLOBAL_SCOPE],table_data->iks_type[LOCAL_SCOPE]);
+  if(table_data->iks_type[GLOBAL_SCOPE] != IKS_NOT_SET_VALUE){
+    address_offset = cod_offsetAndUpdate_global(var_offset);
+    snprintf(code, COD_MAX_SIZE, "loadAI rbss, %d => r%d\n", address_offset, tempReg);
+
+    node->reg = tempReg;
+    node->offset = address_offset;
+
+    CodeList_add(generatedILOC, code);
+  }
 
   // SE ESCOPO LOCAL: registrador rarp
-  // int address_offset = cod_offsetAndUpdate_local(var_offset);
-  // snprintf(code, COD_MAX_SIZE, "loadAI rarp, %d => r%d\n", address_offset, tempReg);
+  if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
+    address_offset = cod_offsetAndUpdate_local(var_offset);
+    snprintf(code, COD_MAX_SIZE, "loadAI rarp, %d => r%d\n", address_offset, tempReg);
+    node->reg = tempReg;
+    node->offset = address_offset;
 
-  node->reg = tempReg;
-  node->offset = address_offset;
-
-  CodeList_add(generatedILOC, code);
+    CodeList_add(generatedILOC, code);
+  }
 }
 
 void cod_generate_atribuicao(comp_tree_t* node)
@@ -224,17 +239,23 @@ void cod_generate_atribuicao(comp_tree_t* node)
   symbol* sid = ast_id->value.data;
   symbol* sexp = ast_exp->value.data;
 
+  char* entry = dict_concat_key(ast_id->value.data->value.s, ast_id->value.data->type);
+  symbol* table_data = dict_get(symbol_table,entry);
+  // printf("ast_id: %s \t entry: %s \t key: %s \n",ast_id->value.data->value.s,entry,table_data->value.s);
   // printf("0: %d %d %d %d\n", snode->type, snode->iks_type[0], snode->iks_type[1], snode->value.i);
-  printf("TESTE DE ESCOPO: %d %d\n", (int) sid->iks_type[0], (int) sid->iks_type[1]);
+  //printf("TESTE DE ESCOPO: %d %d\n", (int) sid->iks_type[0], (int) sid->iks_type[1]);
 
   // TODO: Verificar escopo para atribuição local ou global
   // SE ESCOPO GLOBAL: registrador rbss
-  snprintf(code, COD_MAX_SIZE, "storeAI r%d => rbss, %d\n", ast_exp->reg, address_offset);
-
+  if(table_data->iks_type[GLOBAL_SCOPE] != IKS_NOT_SET_VALUE){
+    snprintf(code, COD_MAX_SIZE, "storeAI r%d => rbss, %d\n", ast_exp->reg, address_offset);
+    CodeList_add(generatedILOC, code);
+  }
   // SE ESCOPO LOCAL: registrador rarp
-  // snprintf(code, COD_MAX_SIZE, "storeAI r%d => rarp\n", ast_exp->reg, address_offset);
-
-  CodeList_add(generatedILOC, code);
+  if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
+    snprintf(code, COD_MAX_SIZE, "storeAI r%d => rarp\n", ast_exp->reg, address_offset);
+    CodeList_add(generatedILOC, code);
+  }
 }
 
 /*

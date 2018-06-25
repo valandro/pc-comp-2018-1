@@ -52,15 +52,15 @@ int comp_get_line_number (void)
 symbol* insert_symbol_table(int token, int type) {
   char *lexeme = strdup(yytext);
   char *entry = strdup(yytext);
-  size_t i;
 
+  size_t i;
   // Caso char ou string, remover aspas da string.
   if(token == TK_LIT_CHAR || token == TK_LIT_STRING) {
     memmove(lexeme, lexeme + 1, strlen(lexeme)); //Remove o primeiro caracter ' ou "
     lexeme[strlen(lexeme) - 1] = '\0'; //Remove o último caracter ' ou "
   }
 
-  // Cast do tipo do token de int para char.
+  // // Cast do tipo do token de int para char.
   int int_value = type;
   char c[10];
   sprintf(c, "%d", int_value);
@@ -68,55 +68,15 @@ symbol* insert_symbol_table(int token, int type) {
   // Combinando valor da lexema com tipo do token, com $ como separador
   strcat(entry, "$");
   strcat(entry, c);
-  
+
   // Procurar o token na tabela de símbolos.
   // Se encontrado, atualiza o valor da última linha encontra.
   // Se não, insere na tabela.
   symbol* foundEntry = dict_get(symbol_table, entry);
-  
   if(foundEntry != NULL) {
     // Atualizar valor para valor da última linha onde lexema é encontrado
     // Atualizando o valor salvo, pois havia um erro de dup no element.value
-    symbol element;
-    element.line = yylineno;
-    
-    switch (token) {
-      case TK_LIT_INT:
-        element.type = POA_LIT_INT;
-        element.value.i = atoi(lexeme);
-        break;
-      case TK_LIT_FLOAT:
-        element.type = POA_LIT_FLOAT;
-        element.value.f = atof(lexeme);
-        break;
-      case TK_LIT_CHAR:
-        element.type = POA_LIT_CHAR;
-        element.value.c = (char) lexeme[0];
-        break;
-      case TK_LIT_TRUE:
-        element.type = POA_LIT_BOOL;
-        element.value.b = true;
-        break;
-      case TK_LIT_FALSE:
-        element.type = POA_LIT_BOOL;
-        element.value.b = false;
-        break;
-      case TK_LIT_STRING:
-        element.type = POA_LIT_STRING;
-        element.value.s = strdup(lexeme);
-        break;
-      case TK_IDENTIFICADOR:
-        element.type = POA_IDENT;
-        element.value.s = strdup(lexeme);
-        break;
-      default:
-        // No default behavior defined.
-        break;
-    }
-    
-    i = insertArray(&symbol_data, element);
-    foundEntry = &symbol_data.array[i];
-    dict_put(symbol_table, entry, foundEntry);
+    foundEntry->line = yylineno;
   } else {
     // Lexema não encontrado, inserindo elemento no array de dados
     symbol element;
@@ -126,34 +86,41 @@ symbol* insert_symbol_table(int token, int type) {
     element.vector_size = IKS_NON_VECTOR ;
 
     switch (token) {
-      case TK_LIT_INT:
+      case TK_LIT_INT: {
         element.type = POA_LIT_INT;
         element.value.i = atoi(lexeme);
         break;
-      case TK_LIT_FLOAT:
+      }
+      case TK_LIT_FLOAT: {
         element.type = POA_LIT_FLOAT;
         element.value.f = atof(lexeme);
         break;
-      case TK_LIT_CHAR:
+      }
+      case TK_LIT_CHAR: {
         element.type = POA_LIT_CHAR;
         element.value.c = (char) lexeme[0];
         break;
-      case TK_LIT_TRUE:
+      }
+      case TK_LIT_TRUE: {
         element.type = POA_LIT_BOOL;
         element.value.b = true;
         break;
-      case TK_LIT_FALSE:
+      }
+      case TK_LIT_FALSE: {
         element.type = POA_LIT_BOOL;
         element.value.b = false;
         break;
-      case TK_LIT_STRING:
+      }
+      case TK_LIT_STRING: {
         element.type = POA_LIT_STRING;
         element.value.s = strdup(lexeme);
         break;
-      case TK_IDENTIFICADOR:
+      }
+      case TK_IDENTIFICADOR: {
         element.type = POA_IDENT;
         element.value.s = strdup(lexeme);
         break;
+      }
       default:
         // No default behavior defined.
         break;
@@ -163,11 +130,16 @@ symbol* insert_symbol_table(int token, int type) {
     foundEntry = &symbol_data.array[i];
     dict_put(symbol_table, entry, foundEntry);
   }
-  
+  symbol* value = dict_get(symbol_table, entry);
+
+  // symbol* huh = dict_get(symbol_table,entry);
+  // printf("foundentry %s\n",huh->line);
+
   free(lexeme);
   free(entry);
 
   // Retorna ponteiro na tabela de símbolos para a entrada.
+  
   return foundEntry;
 }
 
@@ -251,6 +223,7 @@ void declare_var(symbol* ident, int type, int vector_size, int scope) {
       exit(IKS_ERROR_DECLARED);
     }
   }
+  
 }
 
 void declare_class(symbol* ident, ParamList* field_list) {

@@ -8,6 +8,7 @@
 comp_tree_t* tree;
 extern comp_dict_t* symbol_table;
 }
+
 /* Declaração dos tokens da linguagem */
 /* Palavras Reservadas */
 
@@ -352,6 +353,7 @@ TK_OC_LE lit { $$ = ast_make_tree(AST_LITERAL, $2); }|
 attribution:
 TK_IDENTIFICADOR '=' expression {
   comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $1);
+
   $$ = ast_make_binary_node(AST_ATRIBUICAO, ident_node, $3);
 }|
 TK_IDENTIFICADOR '[' expression ']' '=' expression {
