@@ -40,6 +40,7 @@ typedef struct ast_node
   int type;
   int reg; // registrador temporário
   int offset;
+  char* code;
   union
   {
     symbol* data;

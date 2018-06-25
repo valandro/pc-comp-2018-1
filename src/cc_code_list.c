@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "cc_code_list.h"
+#include "cc_misc.h"
+#include "cc_tree.h"
 
 CodeList* CodeList_init() {
   CodeList* code_list = (CodeList*) malloc(sizeof(CodeList));
@@ -37,6 +39,11 @@ CodeList* CodeList_add(CodeList* code_list, char* line) {
   current->next = newLine;
 
   return code_list;
+}
+
+CodeList* CodeList_add_node(CodeList* code_list, char* line, ast_node_t* node) {
+  node->code = line;
+  return CodeList_add(code_list, line);
 }
 
 int CodeList_getSize(CodeList* code_list) {

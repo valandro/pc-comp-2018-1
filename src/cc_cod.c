@@ -5,10 +5,13 @@
 
 #include <stdio.h>
 
+#include "cc_code_list.h"
 #include "cc_cod.h"
 #include "main.h"
 
 extern CodeList* generatedILOC;
+extern comp_dict_t* symbol_table;
+
 unsigned int global_offset = 0;
 unsigned int local_offset = 0;
 
@@ -88,7 +91,6 @@ void cod_generate(comp_tree_t* node) {
   int naoachou = 0;
   // Switch sobre o nodo, para cada uma das estruturas possíveis
   // Em cada caso, chamar função que gera o código para essa estrutura.
-
   switch (nodeType)
   {
     // case AST_IF_ELSE:
@@ -112,9 +114,9 @@ void cod_generate(comp_tree_t* node) {
     case AST_ARIM_DIVISAO:
       cod_generate_arithmetic(node, "div");
       break;
-    // case AST_ARIM_INVERSAO:
-    //   cod_generate_arithmetic_invert(node);
-    //   break;
+    case AST_ARIM_INVERSAO:
+      cod_generate_arithmetic_invert(node);
+      break;
 
     // /* Nodos de comparação lógica */
     // case AST_LOGICO_E:
@@ -180,7 +182,7 @@ void cod_generate_literal(comp_tree_t *node) {
 
   // Salva registrador temporário na AST e insere o código gerado na lista.
   ast_node->reg = tempReg;
-  CodeList_add(generatedILOC, code);
+  CodeList_add_node(generatedILOC, code, ast_node);
 }
 
 void cod_generate_identificador(comp_tree_t *tree) {
@@ -202,7 +204,12 @@ void cod_generate_identificador(comp_tree_t *tree) {
 
 
   // SE ESCOPO GLOBAL: registrador rbss
-  printf("id: %s \tglobal: %d \t\t local: %d\n",table_data->value.s,table_data->iks_type[GLOBAL_SCOPE],table_data->iks_type[LOCAL_SCOPE]);
+  printf("identificador id: %s \tglobal: %d \t\t local: %d\n",
+    table_data->value.s,
+    (int) table_data->iks_type[GLOBAL_SCOPE],
+    (int) table_data->iks_type[LOCAL_SCOPE]
+  );
+
   if(table_data->iks_type[GLOBAL_SCOPE] != IKS_NOT_SET_VALUE){
     address_offset = cod_offsetAndUpdate_global(var_offset);
     snprintf(code, COD_MAX_SIZE, "loadAI rbss, %d => r%d\n", address_offset, tempReg);
@@ -210,9 +217,8 @@ void cod_generate_identificador(comp_tree_t *tree) {
     node->reg = tempReg;
     node->offset = address_offset;
 
-    CodeList_add(generatedILOC, code);
+    CodeList_add_node(generatedILOC, code, node);
   }
-
   // SE ESCOPO LOCAL: registrador rarp
   if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
     address_offset = cod_offsetAndUpdate_local(var_offset);
@@ -220,7 +226,7 @@ void cod_generate_identificador(comp_tree_t *tree) {
     node->reg = tempReg;
     node->offset = address_offset;
 
-    CodeList_add(generatedILOC, code);
+    CodeList_add_node(generatedILOC, code, node);
   }
 }
 
@@ -232,29 +238,22 @@ void cod_generate_atribuicao(comp_tree_t* node)
   ast_node_t *ast_id    = identificador->value;
   ast_node_t *ast_exp   = expressao->value;
 
-
   char* code = malloc(COD_MAX_SIZE);
   int address_offset = ast_id->offset;
 
-  symbol* sid = ast_id->value.data;
-  symbol* sexp = ast_exp->value.data;
-
   char* entry = dict_concat_key(ast_id->value.data->value.s, ast_id->value.data->type);
   symbol* table_data = dict_get(symbol_table,entry);
-  // printf("ast_id: %s \t entry: %s \t key: %s \n",ast_id->value.data->value.s,entry,table_data->value.s);
-  // printf("0: %d %d %d %d\n", snode->type, snode->iks_type[0], snode->iks_type[1], snode->value.i);
-  //printf("TESTE DE ESCOPO: %d %d\n", (int) sid->iks_type[0], (int) sid->iks_type[1]);
 
-  // TODO: Verificar escopo para atribuição local ou global
   // SE ESCOPO GLOBAL: registrador rbss
   if(table_data->iks_type[GLOBAL_SCOPE] != IKS_NOT_SET_VALUE){
     snprintf(code, COD_MAX_SIZE, "storeAI r%d => rbss, %d\n", ast_exp->reg, address_offset);
-    CodeList_add(generatedILOC, code);
+    CodeList_add_node(generatedILOC, code, node->value);
   }
+
   // SE ESCOPO LOCAL: registrador rarp
   if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
-    snprintf(code, COD_MAX_SIZE, "storeAI r%d => rarp\n", ast_exp->reg, address_offset);
-    CodeList_add(generatedILOC, code);
+    snprintf(code, COD_MAX_SIZE, "storeAI r%d => rarp, %d\n", ast_exp->reg, address_offset);
+    CodeList_add_node(generatedILOC, code, node->value);
   }
 }
 
@@ -280,14 +279,35 @@ void cod_generate_arithmetic(comp_tree_t * node, char *op) {
   // Gerar instrução
   char *code = malloc(COD_MAX_SIZE);
   snprintf(
-      code, COD_MAX_SIZE,
-      "%s r%d, r%d => r%d\n",
-      op, reg_1, reg_2, reg_alvo);
+    code, COD_MAX_SIZE,
+    "%s r%d, r%d => r%d\n",
+    op, reg_1, reg_2, reg_alvo
+  );
 
   // Salvo registrador temporário de saída
   ast_exp->reg = reg_alvo;
 
-  CodeList_add(generatedILOC, code);
+  CodeList_add_node(generatedILOC, code, node->value);
 };
 
-void cod_generate_arithmetic_invert(comp_tree_t* node) {};
+void cod_generate_arithmetic_invert(comp_tree_t * node){
+  // Pegar valores dos registradores da operação que estão no nodo.
+  ast_node_t *ast_node = node->value;
+  ast_node_t *id = node->first->value;
+
+  // Gerar registrador temporário para o alvo.
+  int reg_alvo = cod_generateTempRegister();
+
+  // Gerar instrução
+  char *code = malloc(COD_MAX_SIZE);
+  snprintf(
+    code, COD_MAX_SIZE,
+    "multI r%d, -1 => r%d\n",
+    id->reg, reg_alvo
+  );
+
+  // Salvo registrador temporário de saída
+  ast_node->reg = reg_alvo;
+
+  CodeList_add_node(generatedILOC, code, ast_node);
+};

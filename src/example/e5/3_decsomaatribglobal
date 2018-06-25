@@ -1,0 +1,16 @@
+/*
+  GAMMA - Lucas Valandro e Francisco Knebel
+  UFRGS 2018
+*/
+
+int x;
+int main() {
+  
+  int y;
+  int z;
+  
+  y = 4;
+  z = 5;
+
+  x = y + z;
+}

@@ -631,7 +631,7 @@ TK_PR_CASE TK_LIT_INT ':' {
 
 expression:
 '('expression')' {$$ = $2;}|
-'-' expression {$$ = $2;}|
+'-' expression { $$ = ast_make_unary_node(AST_ARIM_INVERSAO, $2); }|
 '+' expression {$$ = $2;}|
 expression '*' expression { $$ = ast_make_binary_node(AST_ARIM_MULTIPLICACAO, $1, $3); }|
 expression '+' expression { $$ = ast_make_binary_node(AST_ARIM_SOMA, $1, $3); }|
