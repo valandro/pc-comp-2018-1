@@ -35,4 +35,7 @@
 
 #define GLOBAL_SCOPE    0
 #define LOCAL_SCOPE     1
+
+#define IKS_VECTOR_INDEX_OVERFLOW 13
+
 #endif

@@ -41,6 +41,8 @@ Para executar os testes individualmente, utilize "ctest -R e1_avaliacao_00 -V".
 
 Teste etapa 3: "make && cat ./file.txt | ./main; dot -Tpng e3.dot -ofilename.png"
 
+Rodar GDB: "gdb main" "run < pathtofile"
+
 * Configurar Makefiles para Etapa
 Para configurar o sistema de compilação para uma determinada etapa, os passos abaixo devem ser realizados (supondo etapa 2).
 

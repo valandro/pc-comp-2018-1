@@ -233,9 +233,31 @@ void cod_generate_atribuicao(comp_tree_t* node)
 
   char* code = malloc(COD_MAX_SIZE);
   int address_offset = ast_id->offset;
+  
+  int arrayIndex = -1;
+  if(ast_id->type == AST_VETOR_INDEXADO) {
+    // Identificador está aninhado no nodo, pois é um vetor.
+    // Reescreve o nodo do identificador do vetor.
+    ast_id = identificador->first->value;
+
+    // Obtém valor inteiro do índice procurado, dentro do vetor.
+    // TODO: não esperar valor inteiro e aceitar expressões.
+    ast_node_t* indice = identificador->first->next->value;
+    symbol* s_indice = indice->value.data;
+    arrayIndex = s_indice->value.i;
+  }
 
   char* entry = dict_concat_key(ast_id->value.data->value.s, ast_id->value.data->type);
   symbol* table_data = dict_get(symbol_table,entry);
+
+  if(arrayIndex != -1) {
+    // Está trabalhando com um array, logo precisa calcular o offset.
+    address_offset = ast_id->offset + arrayIndex * cod_sizeOf(table_data->iks_type[GLOBAL_SCOPE]);
+
+    if(arrayIndex >= table_data->vector_size) {
+      exit(IKS_VECTOR_INDEX_OVERFLOW);
+    }
+  }
 
   // SE ESCOPO GLOBAL: registrador rbss
   if(table_data->iks_type[GLOBAL_SCOPE] != IKS_NOT_SET_VALUE){
