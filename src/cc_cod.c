@@ -118,15 +118,15 @@ void cod_generate(comp_tree_t* node) {
     // case AST_LOGICO_OU:
 
     // Comparação booleana 
-    // case AST_LOGICO_COMP_DIF:
-    // case AST_LOGICO_COMP_IGUAL:
-    // case AST_LOGICO_COMP_LE:
-    // case AST_LOGICO_COMP_GE:
-    // case AST_LOGICO_COMP_L:
-    // case AST_LOGICO_COMP_G:
-    // case AST_LOGICO_COMP_NEGACAO:
-    //   cod_generate_logic(node, type);
-    //   break;
+    case AST_LOGICO_COMP_DIF:
+    case AST_LOGICO_COMP_IGUAL:
+    case AST_LOGICO_COMP_LE:
+    case AST_LOGICO_COMP_GE:
+    case AST_LOGICO_COMP_L:
+    case AST_LOGICO_COMP_G:
+    case AST_LOGICO_COMP_NEGACAO:
+      cod_generate_logic(node, nodeType);
+      break;
 
 
     /* Nodos de varíaveis e valores */
@@ -158,6 +158,60 @@ void cod_generate(comp_tree_t* node) {
     printf("__GENERATE CODE: Não achou case para AST tipo %d. FIX CASE.__\n", nodeType);
   }
 }
+void cod_generate_logic(comp_tree_t *node, int op_type){
+  char *op;
+  comp_tree_t *exp1 = node->first;
+  comp_tree_t *exp2 = node->first->next;
+
+  ast_node_t *ast_res = node->value;
+  ast_node_t *ast_exp1   = exp1->value;
+  ast_node_t *ast_exp2   = exp2->value;
+
+  switch(op_type){
+    case AST_LOGICO_COMP_DIF:
+      op = "cmp_NE";
+      break;
+    case AST_LOGICO_COMP_IGUAL:
+      op = "cmp_EQ";
+      break;
+    case AST_LOGICO_COMP_LE:
+      op = "cmp_LE";    
+      break;
+    case AST_LOGICO_COMP_GE:
+      op = "cmp_GE";    
+      break;
+    case AST_LOGICO_COMP_L:
+      op = "cmp_LT";
+      break;    
+    case AST_LOGICO_COMP_G:
+      op = "cmp_GT";
+      break;
+    case AST_LOGICO_COMP_NEGACAO:
+      break;
+    default:
+      break;
+  }
+
+  int reg_1 = ast_exp1->reg;
+  int reg_2 = ast_exp2->reg;
+
+  // Gerar registrador temporário para o alvo.
+  int reg_alvo = cod_generateTempRegister();
+
+  // Gerar instrução
+  char *code = malloc(COD_MAX_SIZE);
+  snprintf(
+    code, COD_MAX_SIZE,
+    "%s r%d, r%d => r%d\n",
+    op, reg_1, reg_2, reg_alvo
+  );
+
+  // Salvo registrador temporário de saída
+  ast_res->reg = reg_alvo;
+
+  CodeList_add_node(generatedILOC, code, node->value);
+}
+
 
 void cod_generate_literal(comp_tree_t *node) {
   ast_node_t* ast_node = node->value;
@@ -192,10 +246,12 @@ void cod_generate_identificador(comp_tree_t *tree) {
   char* entry = dict_concat_key(data->value.s, data->type);
   symbol* table_data = dict_get(symbol_table,entry);
 
-  printf("identificador id: %s \tglobal: %d \t\t local: %d \t\t vetor: %d\n",
+  printf("identificador id: %s \ttype_global: %d \t\t type_local: %d \t\t reg_g: %d \t\t reg_l: %d  \t\t vetor: %d\n",
     table_data->value.s,
     (int) table_data->iks_type[GLOBAL_SCOPE],
     (int) table_data->iks_type[LOCAL_SCOPE],
+    (int) table_data->iks_reg[GLOBAL_SCOPE],
+    (int) table_data->iks_reg[LOCAL_SCOPE],
     (int) table_data->vector_size
   );
 
@@ -213,6 +269,7 @@ void cod_generate_identificador(comp_tree_t *tree) {
     CodeList_add_node(generatedILOC, code, node);
   } else if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
     // SE ESCOPO LOCAL: registrador rarp
+    
     tempReg = table_data->iks_reg[LOCAL_SCOPE];
     address_offset = table_data->mem_pos[LOCAL_SCOPE];
     snprintf(code, COD_MAX_SIZE, "loadAI rarp, %d => r%d\n", address_offset, tempReg);

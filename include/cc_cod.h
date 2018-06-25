@@ -33,5 +33,6 @@ void cod_generate_atribuicao(comp_tree_t *tree);
 
 void cod_generate_arithmetic(comp_tree_t *node, char *op);
 void cod_generate_arithmetic_invert(comp_tree_t* node);
+void cod_generate_logic(comp_tree_t *node, int op_type);
 
 #endif
