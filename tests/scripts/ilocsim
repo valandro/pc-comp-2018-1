@@ -382,10 +382,10 @@ class Sim:
 def main():
    # Os argumentos são os seguintes
    parser = argparse.ArgumentParser(description='ILOC Simulator')
-   parser.add_argument('-i', '--instructions', type=bool, default=0)
-   parser.add_argument('-m', '--memory', type=bool, default=0)
-   parser.add_argument('-s', '--stats', type=bool, default=0)
-   parser.add_argument('-t', '--trace', type=bool, default=0)
+   parser.add_argument('-i', '--instructions', action='store_true')
+   parser.add_argument('-m', '--memory', action='store_true')
+   parser.add_argument('-s', '--stats', action='store_true')
+   parser.add_argument('-t', '--trace', action='store_true')
    parser.add_argument('--data', type=int, default=0)
    parser.add_argument('--stack', type=int, default=1024)
    # If active (default), strict makes impossible
