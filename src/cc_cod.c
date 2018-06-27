@@ -88,12 +88,11 @@ int cod_sizeOf(int iks_type) {
 void cod_generate(comp_tree_t* node) {
   int nodeType = ((ast_node_t*) node->value)->type;
 
-  int naoachou = 0;
   // Switch sobre o nodo, para cada uma das estruturas possíveis
   // Em cada caso, chamar função que gera o código para essa estrutura.
   switch (nodeType)
   {
-    // case AST_IF_ELSE:
+    case AST_IF_ELSE:             cod_generate_if_else(node); break;
     // case AST_DO_WHILE:
     // case AST_WHILE_DO:
     // case AST_INPUT:
@@ -109,8 +108,8 @@ void cod_generate(comp_tree_t* node) {
     case AST_ARIM_INVERSAO:       cod_generate_arithmetic_invert(node); break;
 
     /* Shift */
-    case AST_SHIFT_RIGHT: cod_generate_arithmetic(node, "rshift"); break;
-    case AST_SHIFT_LEFT:  cod_generate_arithmetic(node, "lshift"); break;
+    case AST_SHIFT_RIGHT:         cod_generate_arithmetic(node, "rshift"); break;
+    case AST_SHIFT_LEFT:          cod_generate_arithmetic(node, "lshift"); break;
 
     /* Nodos de comparação lógica */
     case AST_LOGICO_E:
@@ -122,14 +121,12 @@ void cod_generate(comp_tree_t* node) {
     case AST_LOGICO_COMP_GE:
     case AST_LOGICO_COMP_L:
     case AST_LOGICO_COMP_G:
-    case AST_LOGICO_COMP_NEGACAO:
-      cod_generate_logic(node, nodeType);
-      break;
+    case AST_LOGICO_COMP_NEGACAO: cod_generate_logic(node, nodeType);break;
 
     /* Nodos de varíaveis e valores */
-    case AST_LITERAL: cod_generate_literal(node); break;
-    case AST_IDENTIFICADOR: cod_generate_identificador(node); break;
-    case AST_ATRIBUICAO: cod_generate_atribuicao(node); break;
+    case AST_LITERAL:             cod_generate_literal(node); break;
+    case AST_IDENTIFICADOR:       cod_generate_identificador(node); break;
+    case AST_ATRIBUICAO:          cod_generate_atribuicao(node); break;
     // case AST_VETOR_INDEXADO:
 
     // case AST_CHAMADA_DE_FUNCAO:
@@ -143,18 +140,12 @@ void cod_generate(comp_tree_t* node) {
     // case AST_TIPO_CAMPO:
     // case AST_PIPE_R1:
     // case AST_PIPE_R2:
-    // case AST_DEC_INIT:
-
+    case AST_DEC_INIT:            cod_generate_atribuicao(node); break;
     default:
-      naoachou = 1;
       break;
   }
-
-  if(naoachou == 1) {
-    // FUNÇÃO DE TESTE, REMOVER ANTES DE ENVIAR A ETAPA, APENAS PARA AVISAR CASO ENTRAR EM GENERATE SEM CASE
-    printf("__GENERATE CODE: Não achou case para AST tipo %d. FIX CASE.__\n", nodeType);
-  }
 }
+
 void cod_generate_logic(comp_tree_t *node, int op_type){
   char *op;
   comp_tree_t *exp1 = node->first;
@@ -200,7 +191,7 @@ void cod_generate_logic(comp_tree_t *node, int op_type){
 
   // Gerar registrador temporário para o alvo.
   int reg_alvo = cod_generateTempRegister();
-
+  
   // Gerar instrução
   char *code = malloc(COD_MAX_SIZE);
   snprintf(
@@ -213,8 +204,7 @@ void cod_generate_logic(comp_tree_t *node, int op_type){
   ast_res->reg = reg_alvo;
 
   CodeList_add_node(generatedILOC, code, node->value);
-}
-
+};
 
 void cod_generate_literal(comp_tree_t *node) {
   ast_node_t* ast_node = node->value;
@@ -238,7 +228,7 @@ void cod_generate_literal(comp_tree_t *node) {
   // Salva registrador temporário na AST e insere o código gerado na lista.
   ast_node->reg = tempReg;
   CodeList_add_node(generatedILOC, code, ast_node);
-}
+};
 
 void cod_generate_identificador(comp_tree_t *tree) {
   ast_node_t* node = tree->value;
@@ -287,9 +277,9 @@ void cod_generate_identificador(comp_tree_t *tree) {
       CodeList_add_node(generatedILOC, code, node);
     }
   }
-}
+};
 
-void cod_generate_atribuicao(comp_tree_t* node)
+void cod_generate_atribuicao(comp_tree_t* node) 
 {
   comp_tree_t *identificador = node->first;
   comp_tree_t *expressao = node->first->next;
@@ -336,12 +326,8 @@ void cod_generate_atribuicao(comp_tree_t* node)
     snprintf(code, COD_MAX_SIZE, "storeAI r%d => rarp, %d\n", ast_exp->reg, address_offset);
     CodeList_add_node(generatedILOC, code, node->value);
   }
-}
+};
 
-/*
-  Criação de código para operação aritmética.
-  Recebe o nodo e o operador ILOC da operação desejada.
-*/
 void cod_generate_arithmetic(comp_tree_t * node, char *op) {
   // Pegar valores dos registradores da operação que estão no nodo.
   comp_tree_t *operador1 = node->first;
@@ -391,4 +377,25 @@ void cod_generate_arithmetic_invert(comp_tree_t * node){
   ast_node->reg = reg_alvo;
 
   CodeList_add_node(generatedILOC, code, ast_node);
+};
+
+void cod_generate_if_else(comp_tree_t *tree){
+  comp_tree_t *exp = tree->first;
+  ast_node_t* ast_exp = exp->value;
+  
+
+  char* L1 = cod_generateLabelName(cod_generateLabel());
+  char* L2 = cod_generateLabelName(cod_generateLabel());
+
+  char* code = malloc(COD_MAX_SIZE);
+
+  snprintf(
+    code, COD_MAX_SIZE,
+    "cbr r%d => %s,%s \n",
+    ast_exp->reg, L1,L2
+  );
+  
+  
+
+  CodeList_add_node(generatedILOC, code, tree->value);
 };

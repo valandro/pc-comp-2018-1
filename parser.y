@@ -540,31 +540,34 @@ expression
 ;
 
 conditional:
-TK_PR_IF '(' expression ')' TK_PR_THEN '{' simple_commands '}' {
-  comp_tree_t* if_then_tree_node = ast_make_tree(AST_IF_ELSE, NULL);
+TK_PR_IF '(' expression ')' TK_PR_THEN '{' commands '}' {
+  comp_tree_t* if_then_tree_node = NULL;
 
-  ast_node_t *t = $3->value;
-  tree_insert_node(if_then_tree_node, $3);
   if ($7 != NULL) {
-    tree_insert_node(if_then_tree_node, $7);
+    if_then_tree_node = ast_make_binary_node(AST_IF_ELSE, $3, $7);
+  } else {
+    if_then_tree_node = ast_make_unary_node(AST_IF_ELSE,$3);
   }
+  
   $$ = if_then_tree_node;
 }|
-TK_PR_IF '(' expression ')' TK_PR_THEN '{' simple_commands '}' TK_PR_ELSE '{' simple_commands '}' {
-  comp_tree_t* if_then_tree_node = ast_make_tree(AST_IF_ELSE, NULL);
-  tree_insert_node(if_then_tree_node, $3);
-  if ($7 != NULL) {
-    tree_insert_node(if_then_tree_node, $7);
-  }
-  if ($11 != NULL) {
-    tree_insert_node(if_then_tree_node, $11);
+TK_PR_IF '(' expression ')' TK_PR_THEN '{' commands '}' TK_PR_ELSE '{' commands '}' {
+  comp_tree_t* if_then_tree_node = NULL;
+  if ($7 != NULL && $11 != NULL) {
+    if_then_tree_node = ast_make_ternary_node(AST_IF_ELSE, $3, $7,$11);
+  } else if($7 != NULL){
+    if_then_tree_node = ast_make_binary_node(AST_IF_ELSE,$3,$7);
+  } else if($11 != NULL){
+    if_then_tree_node = ast_make_binary_node(AST_IF_ELSE,$3,$11);
+  } else {
+    if_then_tree_node = ast_make_unary_node(AST_IF_ELSE,$3);    
   }
   $$ = if_then_tree_node;
 }
 ;
 
 iterative:
-TK_PR_FOREACH '(' TK_IDENTIFICADOR ':' list_exp ')' '{' simple_commands '}' {
+TK_PR_FOREACH '(' TK_IDENTIFICADOR ':' list_exp ')' '{' commands '}' {
   comp_tree_t* ident_node = ast_make_tree(AST_IDENTIFICADOR, $3);
   comp_tree_t* foreach_tree_node = ast_make_tree(AST_FOREACH, NULL);
 
@@ -574,7 +577,7 @@ TK_PR_FOREACH '(' TK_IDENTIFICADOR ':' list_exp ')' '{' simple_commands '}' {
 
   $$ = foreach_tree_node;
 }|
-TK_PR_FOR '(' list_exp ':' expression ':' list_exp ')' '{' simple_commands '}' {
+TK_PR_FOR '(' list_exp ':' expression ':' list_exp ')' '{' commands '}' {
   comp_tree_t* for_tree_node = ast_make_tree(AST_FOR, NULL);
 
   tree_insert_node(for_tree_node,$3);
@@ -584,14 +587,14 @@ TK_PR_FOR '(' list_exp ':' expression ':' list_exp ')' '{' simple_commands '}' {
 
   $$ = for_tree_node;
 }|
-TK_PR_WHILE '(' expression ')' TK_PR_DO '{' simple_commands '}' {
+TK_PR_WHILE '(' expression ')' TK_PR_DO '{' commands '}' {
   comp_tree_t* while_tree_node = ast_make_tree(AST_WHILE_DO, NULL);
   tree_insert_node(while_tree_node, $3);
   tree_insert_node(while_tree_node, $7);
 
   $$ = while_tree_node;
 }|
-TK_PR_DO '{' simple_commands '}' TK_PR_WHILE '(' expression ')' {
+TK_PR_DO '{' commands '}' TK_PR_WHILE '(' expression ')' {
   comp_tree_t* while_tree_node = ast_make_tree(AST_DO_WHILE, NULL);
   tree_insert_node(while_tree_node, $3);
   tree_insert_node(while_tree_node, $7);
@@ -601,7 +604,7 @@ TK_PR_DO '{' simple_commands '}' TK_PR_WHILE '(' expression ')' {
 ;
 
 switch:
-TK_PR_SWITCH '(' expression ')' '{' simple_commands '}' {
+TK_PR_SWITCH '(' expression ')' '{' commands '}' {
   comp_tree_t* switch_tree_node = ast_make_tree(AST_SWITCH, NULL);
 
   if($3 != NULL){
