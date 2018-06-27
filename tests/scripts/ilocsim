@@ -45,6 +45,8 @@ class Operation:
       l = []
       # op
       l.append(('nop',None,None))
+      # halt
+      l.append(('halt',None,None))
       # op => l
       l.append(('jumpI','',label,'->'))
       # op => r
@@ -249,6 +251,7 @@ class Sim:
 #      eprint('m',self.mem[0x100001],self.mem[0x100003])
 
    def op_nop    (self,op): pass
+   def op_halt   (self,op): self.ip = len(self.code)+1
 
    def op_add    (self,op): self.reg[op[2]] = self.reg[op[0]]  + self.reg[op[1]]
    def op_sub    (self,op): self.reg[op[2]] = self.reg[op[0]]  - self.reg[op[1]]
@@ -331,6 +334,7 @@ class Sim:
       rbss = self.reg.get('rbss')
       tests =[
       ('nop',),
+      ('halt',),
       ('add r1, r2 => r3',{'r1':1,'r2':3},{'r1':1,'r2':3,'r3':4}),
       ('sub r1, r2 => r3',{'r1':1,'r2':3},{'r1':1,'r2':3,'r3':-2}),
       ('mult r1, r2 => r3',{'r1':1,'r2':3},{'r1':1,'r2':3,'r3':3}),
