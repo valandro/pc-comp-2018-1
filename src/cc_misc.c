@@ -231,10 +231,6 @@ void declare_var(symbol* ident, int type, int vector_size, int scope) {
       } else {
         value->mem_pos[LOCAL_SCOPE] = cod_offsetAndUpdate_local(cod_sizeOf(type));
       }
-
-      if(value->iks_reg[scope] == IKS_NOT_SET_VALUE) {
-        value->iks_reg[scope] = cod_generateTempRegister();
-      }
     } else {
       exit(IKS_ERROR_DECLARED);
     }

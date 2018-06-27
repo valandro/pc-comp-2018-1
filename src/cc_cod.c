@@ -113,10 +113,8 @@ void cod_generate(comp_tree_t* node) {
     case AST_SHIFT_LEFT:  cod_generate_arithmetic(node, "lshift"); break;
 
     /* Nodos de comparação lógica */
-    // E // OU
-    // case AST_LOGICO_E:
-    // case AST_LOGICO_OU:
-
+    case AST_LOGICO_E:
+    case AST_LOGICO_OU:
     // Comparação booleana 
     case AST_LOGICO_COMP_DIF:
     case AST_LOGICO_COMP_IGUAL:
@@ -127,7 +125,6 @@ void cod_generate(comp_tree_t* node) {
     case AST_LOGICO_COMP_NEGACAO:
       cod_generate_logic(node, nodeType);
       break;
-
 
     /* Nodos de varíaveis e valores */
     case AST_LITERAL: cod_generate_literal(node); break;
@@ -168,6 +165,12 @@ void cod_generate_logic(comp_tree_t *node, int op_type){
   ast_node_t *ast_exp2   = exp2->value;
 
   switch(op_type){
+    case AST_LOGICO_E:
+      op = "and";
+      break;
+    case AST_LOGICO_OU:
+      op = "or";
+      break;
     case AST_LOGICO_COMP_DIF:
       op = "cmp_NE";
       break;
@@ -246,38 +249,44 @@ void cod_generate_identificador(comp_tree_t *tree) {
   char* entry = dict_concat_key(data->value.s, data->type);
   symbol* table_data = dict_get(symbol_table,entry);
 
-  printf("identificador id: %s \ttype_global: %d \t\t type_local: %d \t\t reg_g: %d \t\t reg_l: %d  \t\t vetor: %d\n",
-    table_data->value.s,
-    (int) table_data->iks_type[GLOBAL_SCOPE],
-    (int) table_data->iks_type[LOCAL_SCOPE],
-    (int) table_data->iks_reg[GLOBAL_SCOPE],
-    (int) table_data->iks_reg[LOCAL_SCOPE],
-    (int) table_data->vector_size
-  );
+  // printf("identificador id: %s \ttype_global: %d \t\t type_local: %d \t\t reg_g: %d \t\t reg_l: %d  \t\t vetor: %d\n",
+  //   table_data->value.s,
+  //   (int) table_data->iks_type[GLOBAL_SCOPE],
+  //   (int) table_data->iks_type[LOCAL_SCOPE],
+  //   (int) table_data->iks_reg[GLOBAL_SCOPE],
+  //   (int) table_data->iks_reg[LOCAL_SCOPE],
+  //   (int) table_data->vector_size
+  // );
 
   int tempReg;
   int address_offset;
   if(table_data->iks_type[GLOBAL_SCOPE] != IKS_NOT_SET_VALUE){
     // SE ESCOPO GLOBAL: registrador rbss
-    tempReg = table_data->iks_reg[GLOBAL_SCOPE];
-    address_offset = table_data->mem_pos[GLOBAL_SCOPE];
-    snprintf(code, COD_MAX_SIZE, "loadAI rbss, %d => r%d\n", address_offset, tempReg);
+    if(table_data->iks_reg[GLOBAL_SCOPE] == IKS_NOT_SET_VALUE){
+      tempReg = cod_generateTempRegister();
+      table_data->iks_reg[GLOBAL_SCOPE] = tempReg;
+      address_offset = table_data->mem_pos[GLOBAL_SCOPE];
+      snprintf(code, COD_MAX_SIZE, "loadAI rbss, %d => r%d\n", address_offset, tempReg);
 
-    node->reg = tempReg;
-    node->offset = address_offset;
+      node->reg = tempReg;
+      node->offset = address_offset;
 
-    CodeList_add_node(generatedILOC, code, node);
+      CodeList_add_node(generatedILOC, code, node);
+    }
   } else if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
     // SE ESCOPO LOCAL: registrador rarp
-    
-    tempReg = table_data->iks_reg[LOCAL_SCOPE];
-    address_offset = table_data->mem_pos[LOCAL_SCOPE];
-    snprintf(code, COD_MAX_SIZE, "loadAI rarp, %d => r%d\n", address_offset, tempReg);
-  }
-  node->reg = tempReg;
-  node->offset = address_offset;
+    if(table_data->iks_reg[LOCAL_SCOPE] == IKS_NOT_SET_VALUE){
+      tempReg = cod_generateTempRegister();
+      table_data->iks_reg[LOCAL_SCOPE] = tempReg;
+      address_offset = table_data->mem_pos[LOCAL_SCOPE];
+      snprintf(code, COD_MAX_SIZE, "loadAI rarp, %d => r%d\n", address_offset, tempReg);
 
-  CodeList_add_node(generatedILOC, code, node);
+      node->reg = tempReg;
+      node->offset = address_offset;
+
+      CodeList_add_node(generatedILOC, code, node);
+    }
+  }
 }
 
 void cod_generate_atribuicao(comp_tree_t* node)
