@@ -5,8 +5,10 @@
 %code requires{
 #include "main.h"
 #include "cc_tree.h"
+#include "cc_code_list.h"
 comp_tree_t* tree;
 extern comp_dict_t* symbol_table;
+extern CodeList* generatedILOC;
 }
 
 /* Declaração dos tokens da linguagem */
@@ -154,6 +156,8 @@ program: body {
   if ($1 != NULL){
     tree_insert_node($$,$1);
   }
+
+  CodeList_print(generatedILOC);
 }
 ;
 

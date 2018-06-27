@@ -187,7 +187,6 @@ void clearDict(comp_dict_t* dict) {
 void main_finalize (void)
 {
   // Rotinas de encerramento do programa
-  CodeList_print(generatedILOC);
 
   // Liberar array de dados da tabela de símbolos
   freeArray(&symbol_data);

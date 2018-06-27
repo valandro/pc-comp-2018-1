@@ -69,21 +69,20 @@ int CodeList_getSize(CodeList* code_list) {
 void CodeList_print(CodeList* code_list) {
   int index = 1;
 
-  printf("Printing code...\n\n");
   CodeList* previous = NULL;
   CodeList* current = code_list;
   do {
     printf(
-      "%d: %s",
-      index, current->line
+      "%s",
+      current->line
     );
 
     index++;
     previous = current;
     current = current->next;
   } while (previous->next != NULL);
-  printf("\nList over.\n\n");
 }
+
 
 
 
