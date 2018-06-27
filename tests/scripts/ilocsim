@@ -382,6 +382,7 @@ class Sim:
 def main():
    # Os argumentos são os seguintes
    parser = argparse.ArgumentParser(description='ILOC Simulator')
+   # See https://stackoverflow.com/questions/8259001/python-argparse-command-line-flags-without-arguments
    parser.add_argument('-i', '--instructions', action='store_true')
    parser.add_argument('-m', '--memory', action='store_true')
    parser.add_argument('-s', '--stats', action='store_true')
