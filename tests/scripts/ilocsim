@@ -237,7 +237,7 @@ class Sim:
    def step(self):
       if self.trace:
          eprint('%d %s'%(self.ip, self.code[self.ip]))
-         eprint(self.reg['r0'],self.reg['r1'],self.reg['r2'],self.reg['r3'],self.reg['r4'])
+#         eprint(self.reg['r0'],self.reg['r1'],self.reg['r2'],self.reg['r3'],self.reg['r4'])
       self.stats['instructions'] += 1
       op = self.code[self.ip]
       self.reg['rpc'] = self.ip;
