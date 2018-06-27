@@ -386,7 +386,7 @@ def main():
    parser.add_argument('-m', '--memory', type=bool, default=0)
    parser.add_argument('-s', '--stats', type=bool, default=0)
    parser.add_argument('-t', '--trace', type=bool, default=0)
-   parser.add_argument('--bss', type=int, default=0)
+   parser.add_argument('--data', type=int, default=0)
    parser.add_argument('--stack', type=int, default=1024)
    # If active (default), strict makes impossible
    # - any update of bss
@@ -407,7 +407,7 @@ def main():
       program = sys.stdin.read()
 
    # Criar o simulador com o código do program (em program)
-   sim = Sim(program, args.bss, args.stack, args.trace)
+   sim = Sim(program, args.data, args.stack, args.trace)
 
    # Enquanto o tamanho do código do simulador for maior que o PC
    while len(sim.code) > sim.ip:
