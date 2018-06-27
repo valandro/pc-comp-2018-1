@@ -391,7 +391,7 @@ def main():
    # If active (default), strict makes impossible
    # - any update of bss
    # - the first definition of stack (rfp/rsp)
-   parser.add_argument('-x', '--strict', type=bool, default=1)
+   parser.add_argument('-x', '--strict', action='store_true')
    parser.add_argument('ILOCFILE', nargs='?')
    args = parser.parse_args()
 
