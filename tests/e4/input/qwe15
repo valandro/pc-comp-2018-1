@@ -5,4 +5,5 @@ int f()
 {
   int v[10];
   v();
+  return 0;
 }

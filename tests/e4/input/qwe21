@@ -8,7 +8,7 @@
 //CODE: IKS_ERROR_WRONG_TYPE_ARGS
 int g(int a, int b, int c)
 {
-
+  return 0;
 }
 
 int f()
@@ -17,4 +17,5 @@ int f()
   int y;
   string z;
   g(x, y, z);
+  return 0;
 }

@@ -9,4 +9,5 @@ int f()
   int a;
   int b;
   b = a.xis;
+  return 0;
 }
