@@ -10,5 +10,4 @@ int main()
 //0+1 should be added first
 //then with 2
 //then with 3
-//check is made by order of loadI instructions
 
