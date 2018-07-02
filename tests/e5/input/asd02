@@ -1,0 +1,7 @@
+//global + offset
+int v[52];
+int i;
+int main()
+{
+  i = 1234;
+}
