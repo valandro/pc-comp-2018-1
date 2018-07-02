@@ -1,4 +1,4 @@
-/* global arranjo with expression */
+//arranjo global com expressão
 int x;
 int y[21];
 int main()
@@ -10,4 +10,5 @@ int main()
   y[x+1] = 4;
   y[x*x] = 5;
   y[20] = 6;
+  return 0;
 }

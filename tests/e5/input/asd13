@@ -1,3 +1,4 @@
+//while-do
 int x;
 int y;
 int main()
@@ -8,4 +9,5 @@ int main()
     x = x + 1;
     y = (y + 1) * 3;
   };
+  return 0;
 }

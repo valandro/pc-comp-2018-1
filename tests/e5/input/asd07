@@ -1,4 +1,4 @@
-/* arithm. */
+//aritmética
 int y;
 int z;
 int k;
@@ -10,4 +10,5 @@ int main()
   k = 3;
   
   x = 0 * y + z * k;
+  return 0;
 }
