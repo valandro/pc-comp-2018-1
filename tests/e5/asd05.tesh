@@ -1,6 +1,6 @@
 ! timeout 5
 
-$ ./tests/e5/execute.sh "./main < ./tests/e5/input/asd05 | ./tests/scripts/ilocsim --data 0 --stack 1024 -m -x"
+$ ./tests/e5/execute.sh "./main < ./tests/e5/input/asd05 | ./tests/scripts/ilocsim --data 0 --stack 1024 -m -x | grep -v Change"
 > 00000004 1
 > 00000008 2
 > 00000040 3
