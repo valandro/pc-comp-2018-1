@@ -10,4 +10,5 @@ int main()
 
   x = z / y * x;
   z = z + x - y;
+  return 0;
 }
