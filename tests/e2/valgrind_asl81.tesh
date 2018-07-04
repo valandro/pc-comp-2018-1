@@ -1,0 +1,4 @@
+! timeout 3
+! output ignore
+! timeout 6
+$ ./tests/scripts/valgrindtest ./main ./tests/e2/input/asl81

@@ -1,0 +1,5 @@
+! timeout 3
+! output ignore
+! expect return 1
+! timeout 6
+$ ./tests/scripts/valgrindtest ./main ./tests/e2/input/asl22

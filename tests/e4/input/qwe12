@@ -1,0 +1,9 @@
+//Variáveis somente podem ser usadas sem indexação
+//ERROR: uso incorreto
+//CODE: IKS_ERROR_VARIABLE
+int f()
+{
+  int a;
+  v[10] = 2;
+  return 0;
+}

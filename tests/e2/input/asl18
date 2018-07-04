@@ -1,0 +1,3 @@
+//Cada campo tem o encapsulamento, o tipo e um identificador do campo.
+//ERROR: campo sem a especificação do encapsulamento
+class AST_t [ int a ];

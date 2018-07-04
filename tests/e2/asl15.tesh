@@ -1,0 +1,4 @@
+! timeout 3
+! output ignore
+! expect return 1
+$ ./main ./tests/e2/input/asl15

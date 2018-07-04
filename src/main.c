@@ -35,10 +35,10 @@ int main_avaliacao_etapa_1 (int argc, char **argv)
     case '=':
     case '!':
     case '&':
+    case '.':
     case '%':
     case '#':
-    case '^':
-    case '.': print_nome2 (token); break;
+    case '^': print_nome2 (token); break;
     case TK_PR_INT: print_nome(TK_PR_INT); break;
     case TK_PR_FLOAT: print_nome(TK_PR_FLOAT); break;
     case TK_PR_BOOL: print_nome (TK_PR_BOOL); break;
@@ -72,8 +72,6 @@ int main_avaliacao_etapa_1 (int argc, char **argv)
     case TK_OC_OR: print_nome (TK_OC_OR); break;
     case TK_OC_SL: print_nome (TK_OC_SL); break;
     case TK_OC_SR: print_nome (TK_OC_SR); break;
-    case TK_OC_U1: print_nome (TK_OC_U1); break;
-    case TK_OC_U2: print_nome (TK_OC_U2); break;
     case TK_LIT_INT: print_nome (TK_LIT_INT); break;
     case TK_LIT_FLOAT: print_nome (TK_LIT_FLOAT); break;
     case TK_LIT_FALSE: print_nome (TK_LIT_FALSE); break;

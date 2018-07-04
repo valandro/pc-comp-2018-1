@@ -1,0 +1,73 @@
+* E2
+
+#+begin_src shell :results output
+for file in tests/e2/input/asl??; do
+    echo $file;
+    TARGET=$file.tesh;
+
+    ERROR=$(cat $file | grep ERROR | wc -l);
+    echo $ERROR;
+    echo "! timeout 3" > $TARGET;
+    echo "! output ignore" >> $TARGET;
+    if [ $ERROR -eq 1 ]; then echo "! expect return 1" >> $TARGET; fi;
+    echo "$ ./main ./$file" >> $TARGET;
+
+    TARGETVAL="$(dirname $file)/valgrind_$(basename $file).tesh";
+    echo "! timeout 3" > $TARGETVAL;
+    echo "! output ignore" >> $TARGETVAL;
+    if [ $ERROR -eq 1 ]; then echo "! expect return 1" >> $TARGETVAL; fi;
+    echo "! timeout 6" >> $TARGETVAL;
+    echo "$ ./tests/scripts/valgrindtest ./main ./$file" >> $TARGETVAL;
+done
+mv ./tests/e2/input/*.tesh ./tests/e2/
+#+end_src
+
+* E4
+
+#+begin_src shell :results output
+pwd
+ERRORFILE=e4/input/errors.h
+for file in $(ls e4/input/qwe??); do
+    echo $file
+    CODESTR=$(cat $file | grep CODE | cut -d":" -f2 | sed 's/ //g')
+    CODE=$(cat $ERRORFILE | grep $CODESTR | awk '{ print $3 }')
+
+    TARGET=$file.tesh
+    echo "! timeout 5" > $TARGET;
+    echo "! output ignore" >> $TARGET;
+    if [ -n "$CODESTR" ]; then echo "! expect return $CODE" >> $TARGET; fi;
+    echo "$ ./main ./tests/$file" >> $TARGET;
+
+    TARGETVAL="$(dirname $file)/valgrind_$(basename $file).tesh";
+    echo "! timeout 6" > $TARGETVAL;
+    echo "! output ignore" >> $TARGETVAL;
+    if [ -n "$CODESTR" ]; then echo "! expect return $CODE" >> $TARGETVAL; fi;
+    echo "$ ./tests/scripts/valgrindtest ./main ./tests/$file" >> $TARGETVAL;
+done
+mv ./e4/input/*.tesh ./e4/
+#+end_src
+
+#+RESULTS:
+#+begin_example
+/home/schnorr/ensino/pc/tests
+e4/input/qwe01
+e4/input/qwe02
+e4/input/qwe03
+e4/input/qwe05
+e4/input/qwe06
+e4/input/qwe07
+e4/input/qwe08
+e4/input/qwe09
+e4/input/qwe10
+e4/input/qwe11
+e4/input/qwe12
+e4/input/qwe13
+e4/input/qwe14
+e4/input/qwe15
+e4/input/qwe16
+e4/input/qwe17
+e4/input/qwe18
+e4/input/qwe19
+e4/input/qwe20
+e4/input/qwe21
+#+end_example
