@@ -237,7 +237,7 @@ void cod_generate_identificador(comp_tree_t *tree) {
   char* code = malloc(COD_MAX_SIZE);
 
   char* entry = dict_concat_key(data->value.s, data->type);
-  symbol* table_data = dict_get(symbol_table,entry);
+  symbol* table_data = dict_get(symbol_table, entry);
 
   // printf("identificador id: %s \ttype_global: %d \t\t type_local: %d \t\t reg_g: %d \t\t reg_l: %d  \t\t vetor: %d\n",
   //   table_data->value.s,
@@ -250,20 +250,7 @@ void cod_generate_identificador(comp_tree_t *tree) {
 
   int tempReg;
   int address_offset;
-  if(table_data->iks_type[GLOBAL_SCOPE] != IKS_NOT_SET_VALUE){
-    // SE ESCOPO GLOBAL: registrador rbss
-    if(table_data->iks_reg[GLOBAL_SCOPE] == IKS_NOT_SET_VALUE){
-      tempReg = cod_generateTempRegister();
-      table_data->iks_reg[GLOBAL_SCOPE] = tempReg;
-      address_offset = table_data->mem_pos[GLOBAL_SCOPE];
-      snprintf(code, COD_MAX_SIZE, "loadAI rbss, %d => r%d\n", address_offset, tempReg);
-
-      node->reg = tempReg;
-      node->offset = address_offset;
-
-      CodeList_add_node(generatedILOC, code, node);
-    }
-  } else if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
+  if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
     // SE ESCOPO LOCAL: registrador rarp
     if(table_data->iks_reg[LOCAL_SCOPE] == IKS_NOT_SET_VALUE){
       tempReg = cod_generateTempRegister();
@@ -275,6 +262,27 @@ void cod_generate_identificador(comp_tree_t *tree) {
       node->offset = address_offset;
 
       CodeList_add_node(generatedILOC, code, node);
+    } else {
+      node->reg = table_data->iks_reg[LOCAL_SCOPE];
+      address_offset = table_data->mem_pos[LOCAL_SCOPE];
+    }
+  } else {
+    if(table_data->iks_type[GLOBAL_SCOPE] != IKS_NOT_SET_VALUE){
+      // SE ESCOPO GLOBAL: registrador rbss
+      if(table_data->iks_reg[GLOBAL_SCOPE] == IKS_NOT_SET_VALUE){
+        tempReg = cod_generateTempRegister();
+        table_data->iks_reg[GLOBAL_SCOPE] = tempReg;
+        address_offset = table_data->mem_pos[GLOBAL_SCOPE];
+        snprintf(code, COD_MAX_SIZE, "loadAI rbss, %d => r%d\n", address_offset, tempReg);
+
+        node->reg = tempReg;
+        node->offset = address_offset;
+
+        CodeList_add_node(generatedILOC, code, node);
+      } else {
+        node->reg = table_data->iks_reg[GLOBAL_SCOPE];
+        address_offset = table_data->mem_pos[GLOBAL_SCOPE];
+      }
     }
   }
 };
@@ -288,8 +296,8 @@ void cod_generate_atribuicao(comp_tree_t* node)
   ast_node_t *ast_exp   = expressao->value;
 
   char* code = malloc(COD_MAX_SIZE);
-  int address_offset = ast_id->offset;
-  
+
+  int address_offset;
   int arrayIndex = -1;
   if(ast_id->type == AST_VETOR_INDEXADO) {
     // Identificador está aninhado no nodo, pois é um vetor.
@@ -312,6 +320,12 @@ void cod_generate_atribuicao(comp_tree_t* node)
 
     if(arrayIndex >= table_data->vector_size) {
       exit(IKS_VECTOR_INDEX_OVERFLOW);
+    }
+  } else {
+    if (table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE) {
+      address_offset = ast_id->value.data->mem_pos[LOCAL_SCOPE];
+    } else {
+      address_offset = ast_id->value.data->mem_pos[GLOBAL_SCOPE];
     }
   }
 
