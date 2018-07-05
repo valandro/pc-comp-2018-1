@@ -1,0 +1,22 @@
+
+int z() {
+  int a;
+  int b;
+  a = 3;
+  b = a + 3;
+
+  return b;
+}
+
+
+int main() {
+  int x;
+  int y;
+
+  x = 1;
+  y = 2;
+
+  z();
+
+  return x + y;
+}

@@ -8,7 +8,8 @@
 #include "cc_code_list.h"
 comp_tree_t* tree;
 extern comp_dict_t* symbol_table;
-extern CodeList* generatedILOC;
+extern CodeList* generatedILOC[10];
+extern int functionScope;
 }
 
 /* Declaração dos tokens da linguagem */
@@ -157,7 +158,11 @@ program: body {
     tree_insert_node($$,$1);
   }
 
-  CodeList_print(generatedILOC);
+  CodeList_add(generatedILOC[0], find_main_label());
+
+  for(int i = 0; i < 10; i++) {
+    CodeList_print(generatedILOC[i]);
+  }
 }
 ;
 
@@ -218,19 +223,15 @@ TK_IDENTIFICADOR TK_IDENTIFICADOR '[' TK_LIT_INT ']' {
 ;
 
 dec_func:
-TK_PR_STATIC type TK_IDENTIFICADOR '(' list_params ')' '{' commands '}' {
-  $$ = ast_make_tree(AST_FUNCAO, $3);
-  if ($8 != NULL)
-  {
-    tree_insert_node($$, $8);
-  }
+TK_PR_STATIC type TK_IDENTIFICADOR {
+  cod_generate_funcao($3);
+} '(' list_params ')' '{' commands '}' {
+  $$ = ast_make_tree_and_insert(AST_FUNCAO, $3, $9);
 }|
-type TK_IDENTIFICADOR '(' list_params ')' '{' commands '}' {
-  $$ = ast_make_tree(AST_FUNCAO, $2);
-  if ($7 != NULL)
-  {
-    tree_insert_node($$, $7);
-  }
+type TK_IDENTIFICADOR {
+  cod_generate_funcao($2);
+} '(' list_params ')' '{' commands '}' {
+  $$ = ast_make_tree_and_insert(AST_FUNCAO, $2, $8);
 }
 ;
 
@@ -265,7 +266,8 @@ command_block:
     }
 }
 ;
-commands: 
+
+commands:
 simple_commands commands {
   if($2 != NULL && $1 != NULL){
     $$ = $1;

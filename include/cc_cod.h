@@ -36,4 +36,10 @@ void cod_generate_arithmetic_invert(comp_tree_t* node);
 void cod_generate_logic(comp_tree_t *node, int op_type);
 void cod_generate_if_else(comp_tree_t *tree);
 
+void cod_generate_chamadafuncao(comp_tree_t* node);
+void cod_generate_return(comp_tree_t* node);
+void cod_generate_funcao(symbol* s);
+
+int find_main_label();
+
 #endif

@@ -72,10 +72,12 @@ void CodeList_print(CodeList* code_list) {
   CodeList* previous = NULL;
   CodeList* current = code_list;
   do {
-    printf(
-      "%s",
-      current->line
-    );
+    if(current->line != NULL) {
+      printf(
+        "%s",
+        current->line
+      );
+    }
 
     index++;
     previous = current;

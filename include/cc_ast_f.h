@@ -17,11 +17,14 @@
 #define __CC_AST_FUNCTIONS_H
 
 comp_tree_t* ast_make_tree(int type, symbol *data);
+comp_tree_t* ast_make_tree_and_insert(int type, symbol *data, comp_tree_t* insert_node);
 comp_tree_t* ast_make_binary_node(int type, comp_tree_t *node1, comp_tree_t *node2);
 comp_tree_t* ast_make_ternary_node(int type, comp_tree_t *node1, comp_tree_t *node2, comp_tree_t *node3);
 comp_tree_t* ast_make_unary_node(int type, comp_tree_t *node);
 comp_tree_t* ast_dec_init(int type, symbol* node1, comp_tree_t* node2);
 
 comp_tree_t *comp_t_get_next(comp_tree_t *ptr);
+
+int ast_find_return_node_reg(comp_tree_t* node);
 
 #endif

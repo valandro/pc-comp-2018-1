@@ -9,14 +9,16 @@
 #include "cc_cod.h"
 #include "main.h"
 
-extern CodeList* generatedILOC;
+extern CodeList* generatedILOC[10];
 extern comp_dict_t* symbol_table;
+extern int functionScope;
 
 unsigned int global_offset = 0;
 unsigned int local_offset = 0;
 
 unsigned int registerIndex = 0;
 unsigned int labelIndex = 0;
+
 
 // Atualiza o contador de offset e retorna o valor original
 unsigned int cod_offsetAndUpdate_global(int size)
@@ -97,8 +99,6 @@ void cod_generate(comp_tree_t* node) {
     // case AST_WHILE_DO:
     // case AST_INPUT:
     // case AST_OUTPUT:
-    // case AST_RETURN:
-    // case AST_BLOCO:
 
     /* Nodos aritméticos */
     case AST_ARIM_SOMA:           cod_generate_arithmetic(node, "add"); break;
@@ -127,9 +127,10 @@ void cod_generate(comp_tree_t* node) {
     case AST_LITERAL:             cod_generate_literal(node); break;
     case AST_IDENTIFICADOR:       cod_generate_identificador(node); break;
     case AST_ATRIBUICAO:          cod_generate_atribuicao(node); break;
-    // case AST_VETOR_INDEXADO:
+    case AST_DEC_INIT:            cod_generate_atribuicao(node); break;
 
-    // case AST_CHAMADA_DE_FUNCAO:
+    case AST_CHAMADA_DE_FUNCAO:   cod_generate_chamadafuncao(node); break;
+    case AST_RETURN:              cod_generate_return(node); break;
 
     // case AST_BREAK:
     // case AST_CONTINUE:
@@ -140,7 +141,7 @@ void cod_generate(comp_tree_t* node) {
     // case AST_TIPO_CAMPO:
     // case AST_PIPE_R1:
     // case AST_PIPE_R2:
-    case AST_DEC_INIT:            cod_generate_atribuicao(node); break;
+
     default:
       break;
   }
@@ -203,7 +204,7 @@ void cod_generate_logic(comp_tree_t *node, int op_type){
   // Salvo registrador temporário de saída
   ast_res->reg = reg_alvo;
 
-  CodeList_add_node(generatedILOC, code, node->value);
+  CodeList_add_node(generatedILOC[functionScope], code, node->value);
 };
 
 void cod_generate_literal(comp_tree_t *node) {
@@ -227,7 +228,7 @@ void cod_generate_literal(comp_tree_t *node) {
 
   // Salva registrador temporário na AST e insere o código gerado na lista.
   ast_node->reg = tempReg;
-  CodeList_add_node(generatedILOC, code, ast_node);
+  CodeList_add_node(generatedILOC[functionScope], code, ast_node);
 };
 
 void cod_generate_identificador(comp_tree_t *tree) {
@@ -238,15 +239,6 @@ void cod_generate_identificador(comp_tree_t *tree) {
 
   char* entry = dict_concat_key(data->value.s, data->type);
   symbol* table_data = dict_get(symbol_table, entry);
-
-  // printf("identificador id: %s \ttype_global: %d \t\t type_local: %d \t\t reg_g: %d \t\t reg_l: %d  \t\t vetor: %d\n",
-  //   table_data->value.s,
-  //   (int) table_data->iks_type[GLOBAL_SCOPE],
-  //   (int) table_data->iks_type[LOCAL_SCOPE],
-  //   (int) table_data->iks_reg[GLOBAL_SCOPE],
-  //   (int) table_data->iks_reg[LOCAL_SCOPE],
-  //   (int) table_data->vector_size
-  // );
 
   int tempReg;
   int address_offset;
@@ -261,7 +253,7 @@ void cod_generate_identificador(comp_tree_t *tree) {
       node->reg = tempReg;
       node->offset = address_offset;
 
-      CodeList_add_node(generatedILOC, code, node);
+      CodeList_add_node(generatedILOC[functionScope], code, node);
     } else {
       node->reg = table_data->iks_reg[LOCAL_SCOPE];
       address_offset = table_data->mem_pos[LOCAL_SCOPE];
@@ -278,7 +270,7 @@ void cod_generate_identificador(comp_tree_t *tree) {
         node->reg = tempReg;
         node->offset = address_offset;
 
-        CodeList_add_node(generatedILOC, code, node);
+        CodeList_add_node(generatedILOC[functionScope], code, node);
       } else {
         node->reg = table_data->iks_reg[GLOBAL_SCOPE];
         address_offset = table_data->mem_pos[GLOBAL_SCOPE];
@@ -332,13 +324,13 @@ void cod_generate_atribuicao(comp_tree_t* node)
   // SE ESCOPO GLOBAL: registrador rbss
   if(table_data->iks_type[GLOBAL_SCOPE] != IKS_NOT_SET_VALUE){
     snprintf(code, COD_MAX_SIZE, "storeAI r%d => rbss, %d\n", ast_exp->reg, address_offset);
-    CodeList_add_node(generatedILOC, code, node->value);
+    CodeList_add_node(generatedILOC[functionScope], code, node->value);
   }
 
   // SE ESCOPO LOCAL: registrador rarp
   if(table_data->iks_type[LOCAL_SCOPE] != IKS_NOT_SET_VALUE){
     snprintf(code, COD_MAX_SIZE, "storeAI r%d => rarp, %d\n", ast_exp->reg, address_offset);
-    CodeList_add_node(generatedILOC, code, node->value);
+    CodeList_add_node(generatedILOC[functionScope], code, node->value);
   }
 };
 
@@ -368,7 +360,7 @@ void cod_generate_arithmetic(comp_tree_t * node, char *op) {
   // Salvo registrador temporário de saída
   ast_exp->reg = reg_alvo;
 
-  CodeList_add_node(generatedILOC, code, node->value);
+  CodeList_add_node(generatedILOC[functionScope], code, node->value);
 };
 
 void cod_generate_arithmetic_invert(comp_tree_t * node){
@@ -390,7 +382,7 @@ void cod_generate_arithmetic_invert(comp_tree_t * node){
   // Salvo registrador temporário de saída
   ast_node->reg = reg_alvo;
 
-  CodeList_add_node(generatedILOC, code, ast_node);
+  CodeList_add_node(generatedILOC[functionScope], code, ast_node);
 };
 
 void cod_generate_if_else(comp_tree_t *tree){
@@ -411,5 +403,41 @@ void cod_generate_if_else(comp_tree_t *tree){
   
   
 
-  CodeList_add_node(generatedILOC, code, tree->value);
+  CodeList_add_node(generatedILOC[functionScope], code, tree->value);
 };
+
+void cod_generate_return(comp_tree_t* node) {
+  // Retornar registrador temporário da expressão para o nodo de retorno.
+  comp_tree_t* expression = node->first;
+  ast_node_t* ast_return = expression->value;
+
+  ast_node_t* returnNode = node->value;
+  returnNode->reg = ast_return->reg;
+}
+
+void cod_generate_chamadafuncao(comp_tree_t* node) {
+  ast_node_t* ast_node1 = node->value;
+  ast_node_t* ast_node2 = node->first->value;
+
+}
+
+void cod_generate_funcao(symbol* s) {
+  functionScope++;
+  s->label = cod_generateLabel();
+
+  char* str = malloc(COD_LABEL_LENGTH);
+  snprintf(str, COD_LABEL_LENGTH, "L%d: ", s->label);
+  CodeList_add(generatedILOC[functionScope], str);
+}
+
+int find_main_label() {
+  // char* entry = dict_concat_key(data->value.s, data->type);
+  // symbol* table_data = dict_get(symbol_table, "main$6");
+  // if(table_data == NULL) {
+    // printf("null");
+  // }
+
+  dict_debug_print(symbol_table);
+  
+  return 0;
+}

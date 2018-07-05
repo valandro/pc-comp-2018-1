@@ -26,6 +26,7 @@ typedef struct {
   int iks_reg[2];
   int mem_pos[2];
   int vector_size;
+  int label;
 
   ParamList* field_list;
   union tValue value;

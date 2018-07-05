@@ -12,7 +12,9 @@ extern char *yytext;
 comp_dict_t *symbol_table;
 
 symbolArray symbol_data;
-CodeList* generatedILOC;
+CodeList* generatedILOC[10];
+
+int functionScope = 0;
 
 void initArray(symbolArray *a) {
   a->array = (symbol*) malloc(DICT_SIZE * sizeof(symbol));
@@ -158,7 +160,11 @@ void main_init (int argc, char **argv)
   symbol_table = dict_new();
   initArray(&symbol_data);
 
-  generatedILOC = CodeList_init();
+  for(int i = 0; i < 10; i++) {
+    generatedILOC[i] = CodeList_init();
+  }
+
+  CodeList_add(generatedILOC[0], "loadI 0 => rarp\nloadI 0 => rsp\nloadI 0 => rbss\n");
 }
 
 int clearDictEntries(comp_dict_t* dict) {
