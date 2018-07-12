@@ -231,6 +231,7 @@ TK_PR_STATIC type TK_IDENTIFICADOR {
 type TK_IDENTIFICADOR {
   cod_generate_funcao($2);
 } '(' list_params ')' '{' commands '}' {
+  
   $$ = ast_make_tree_and_insert(AST_FUNCAO, $2, $8);
 }
 ;
@@ -412,6 +413,13 @@ TK_IDENTIFICADOR '(' ')' {
 }|
 TK_IDENTIFICADOR '(' func_params ')' {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
+  comp_tree_t* func_params = $3;
+  
+  // ast_node_t* ast_node2 = func_params->value;
+  // symbol* dict2 = ast_node2->value.data;
+  // printf("%d\n",dict2->iks_type[LOCAL_SCOPE]);
+  
+  ParamList_debug_print(ParamList_generate(func_params));
   $$ = ast_make_binary_node(AST_CHAMADA_DE_FUNCAO,ident_tree,$3);
 }|
 TK_IDENTIFICADOR '('')' TK_OC_U1 fp pipes {
@@ -451,40 +459,14 @@ TK_IDENTIFICADOR '(' func_params ')' TK_OC_U2 fp pipes {
 func_params:
 expression ',' func_params {
   // TODO: fix árvore de paramêtros da função
-  // if($3 != NULL){
-  //   tree_insert_node($$,$3);   
-  // }
-
-  // Adiciona argumentos na lista.
-  // $$ = ParamList_addParam($3, $1, NULL);
+  if($3 != NULL){
+    tree_insert_node($1,$3);   
+  }
+ 
+  $$ = $1;
 }|
 expression {
-  ast_node_t* node_ast = (ast_node_t*) $1->value;
-  symbol* data = node_ast->value.data;
-
-  char key[1000]; // Magic number
-  switch(data->type) {
-    case POA_LIT_INT:  
-      sprintf(key, "%d$%d", data->value.i, (int)data->type);
-      break;
-    case POA_LIT_FLOAT:
-      sprintf(key, "%f$%d", data->value.f, (int)data->type);
-      break;
-    case POA_LIT_CHAR:
-      sprintf(key, "%c$%d", data->value.c, (int)data->type);
-      break;
-    case POA_LIT_STRING:
-      sprintf(key, "%s$%d", data->value.s, (int)data->type);
-      break;
-    case POA_IDENT:
-      sprintf(key, "%s$%d", data->value.s, (int)data->type);
-      break;
-  }
-
-  symbol* value = dict_get(symbol_table, key);
-  ParamList* param_list = ParamList_init(value->iks_type[LOCAL_SCOPE], NULL);
-
-  // $$ = param_list;
+  $$ = $1;
 }
 ;
 
@@ -492,7 +474,6 @@ fp:
 TK_IDENTIFICADOR '(' '.' ')' {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
   $$ = ident_tree;
-
 }| 
 TK_IDENTIFICADOR '(' '.' ',' list_exp ')' {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
@@ -660,13 +641,13 @@ TK_LIT_INT { $$ = ast_make_tree(AST_LITERAL, $1); }|
 TK_LIT_FLOAT { $$ = ast_make_tree(AST_LITERAL, $1); }|
 func_call { $$ = $1; }|
 TK_IDENTIFICADOR {
-  $$ = ast_make_tree(AST_IDENTIFICADOR, $1); 
   ident_verify($1,LOCAL_SCOPE,IKS_NON_VECTOR);
+  $$ = ast_make_tree(AST_IDENTIFICADOR, $1); 
 }|
 TK_IDENTIFICADOR '['expression']' {
   comp_tree_t* ident_tree = ast_make_tree(AST_IDENTIFICADOR, $1);
-  $$ = ast_make_binary_node(AST_VETOR_INDEXADO, ident_tree, $3);
   ident_verify($1,LOCAL_SCOPE,IKS_VECTOR);  
+  $$ = ast_make_binary_node(AST_VETOR_INDEXADO, ident_tree, $3);
 }
 ;
 %%

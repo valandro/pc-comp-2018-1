@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cc_list.h"
+#include "cc_misc.h"
 #include <string.h>
 
 ParamList* ParamList_init(int type, char* identificador) {
@@ -81,5 +82,25 @@ void ParamList_debug_print(ParamList* param_list) {
   printf("List over.\n\n");
 }
 
+ParamList* ParamList_generate(comp_tree_t* tree){
+  comp_tree_t* node = tree;
+  ast_node_t* ast_node;
+  symbol* dict_entry;
+  ParamList* list;
 
+  if(node != NULL){
+    ast_node = node->value;
+    dict_entry = ast_node->value.data;
+    list = ParamList_init(dict_entry->iks_type[LOCAL_SCOPE],dict_entry->value.s);  
+    node = comp_t_get_next(node);    
+  }
+  while(node != NULL){
+    ast_node = node->value;
+    dict_entry = ast_node->value.data;
+    list = ParamList_addParam(list,dict_entry->iks_type[LOCAL_SCOPE],dict_entry->value.s);
+    node = comp_t_get_next(node);
+  }
+
+  return list;
+}
 
