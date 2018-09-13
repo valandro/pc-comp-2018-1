@@ -1,7 +1,10 @@
 #+STARTUP: overview indent
-#+Title: GAMMA
+#+Title: Grupo GAMMA
 
-* Prerequisitos
+- Lucas Valandro
+- Francisco Knebel
+
+* Pré requisitos
 
 Este programa depende das seguintes bibliotecas
 - cmake (criação de Makefiles /out-of-source/)
@@ -9,7 +12,7 @@ Este programa depende das seguintes bibliotecas
 - flex
 - valgrind (para testes)
 
-* Compilação e Execução
+* Compilação e execução
 
 #+begin_src shell :results output
 git clone git@github.com:FranciscoKnebel/pc-comp.git
