@@ -28,7 +28,7 @@ make
 
 * Testes
 
-No diretório que tem o binário =main=, execute
+Dentro do diretório /build, execute
 
 #+begin_src shell :results output
 ctest -R e1
@@ -55,6 +55,3 @@ cmake -DE1=OFF -DE2=ON .
 
 make
 #+end_src
-
-* Documentação
-
