@@ -3,9 +3,19 @@
 # Project Compiler
 
 ### About
-This project consists in a college project for discipline `INF01147 - Compilers (Federal University of Rio Grande do Sul)`. 
+
+This project consists in a college project for discipline `INF01147 - Compilers (Federal University of Rio Grande do Sul)`. The main goal of this project it's build a compiler from 0 to `ILOC`, passing throught important compilation steps, like:
+
+ - Lexical Analysis
+ - Syntax Analysis
+ - AST `(Abstract syntax tree)`
+ - Semanthic Analysis
+ - Code Generation
+ - Execution Suport
 
 ### Running instructions
+
+After clone the repository, on root directory:
 
 ```shell
 mkdir -p pc/build
@@ -46,7 +56,7 @@ For running the tests of E1.
 - cmake
 - bison
 - flex
-- valgrind (para testes)
+- valgrind
 
 ### Contributors
 
